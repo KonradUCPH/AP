@@ -1,2 +1,4 @@
 #stack working directories
 *.stack-work
+
+*.zip
