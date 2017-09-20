@@ -1,0 +1,12 @@
+code-proof of monadic law 1:
+
+*SubsInterpreter> do x <- return (TrueVal); (\b -> return b) x 
+TrueVal
+*SubsInterpreter> do (\b -> return b) (TrueVal)
+TrueVal
+
++ write text reasoning about it
+
+
+Source of code:
+https://wiki.haskell.org/Monad_Laws

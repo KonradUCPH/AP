@@ -6,40 +6,28 @@ module SubsInterpreter
        where
 
 import SubsAst
+import Value
+import qualified Primitives as P
 
 -- You might need the following imports
 import Control.Monad
 import qualified Data.Map as Map
 import Data.Map(Map)
 
-
--- | A value is either an integer, the special constant undefined,
---   true, false, a string, or an array of values.
--- Expressions are evaluated to values.
-data Value = IntVal Int
-           | UndefinedVal
-           | TrueVal | FalseVal
-           | StringVal String
-           | ArrayVal [Value]
-           deriving (Eq, Show)
-
-
-type Error = String
 type Env = Map Ident Value
-type Primitive = [Value] -> Either Error Value
-type PEnv = Map FunName Primitive
+type PEnv = Map FunName P.Primitive
 type Context = (Env, PEnv)
 
 initialContext :: Context
 initialContext = (Map.empty, initialPEnv)
   where initialPEnv =
-          Map.fromList [ ("===", pCompare)
-                       , ("<", pLT)
-                       , ("+", pAdd)
-                       , ("*", pMul)
-                       , ("-", pMinus)
-                       , ("%", pMod)
-                       , ("Array", pMkArray)
+          Map.fromList [ ("===", P.compareP)
+                       , ("<", P.lt)
+                       , ("+", P.add)
+                       , ("*", P.mul)
+                       , ("-", P.minus)
+                       , ("%", P.modP)
+                       , ("Array", P.mkArray)
                        ]
 
 newtype SubsM a = SubsM {runSubsM :: Context -> Either Error (a, Env)}
@@ -70,42 +58,6 @@ instance Monad SubsM where
   -- fail :: String -> m a
   fail s = SubsM ( \_ -> Left s )
 
-
-pMkArray :: Primitive
-pMkArray [IntVal n] | n >= 0 = return $ ArrayVal (replicate n UndefinedVal)
-pMkArray _ = Left "Array() called with wrong number or type of arguments"
-
-pAdd :: Primitive
-pAdd [IntVal x, IntVal y] = return $ IntVal $ x + y
-pAdd [StringVal x, StringVal y] = return $ StringVal $ x ++ y
-pAdd [StringVal x, IntVal y] = return $ StringVal $ x ++ show y
-pAdd [IntVal x, StringVal y] = return $ StringVal $ show x ++ y
-pAdd _ = Left "Add() called with wrong number or type of arguments"
-
-pMul :: Primitive
-pMul [IntVal x, IntVal y] = return $ IntVal $ x * y
-pMul _ = Left "Mul() called with wrong number or type of arguments"
-
-pMinus :: Primitive
-pMinus [IntVal x, IntVal y] = return $ IntVal $ x - y
-pMinus _ = Left "Minus() called with wrong number or type of arguments"
-
-pLT :: Primitive
-pLT [IntVal x, IntVal y] | x < y = return TrueVal
-pLT [IntVal _, IntVal _] = return FalseVal
-pLT [StringVal x, StringVal y] | x < y = return TrueVal
-pLT [StringVal _, StringVal _] = return FalseVal
-pLT _ = Left "LessThan() called with wrong number or type of arguments"
-
-pMod :: Primitive
-pMod [IntVal x, IntVal y] = return $ IntVal $ mod x y
-pMod _ = Left "Mod() called with wrong number or type of arguments"
-
-pCompare :: Primitive
-pCompare [x, y] | x == y = return TrueVal
-pCompare [_, _] = return FalseVal
-pCompare _ = Left "Compare() called with wrong number or type of arguments"
-
 modifyEnv :: (Env -> Env) -> SubsM ()
 modifyEnv f = SubsM (\(env, _) -> Right ( (), f env))
 
@@ -116,7 +68,7 @@ deleteVar :: Ident -> SubsM ()
 deleteVar name= modifyEnv $ Map.delete name
 
 getVar :: Ident -> SubsM Value
-getVar name = SubsM (\(env, _) ->  -- QUESTION: how to use return and fail here?
+getVar name = SubsM (\(env, _) ->
                 case Map.lookup name env of
                   (Just v) -> Right (v, env)
                   Nothing -> Left ("Variable used but not defined: \""
@@ -132,7 +84,7 @@ getMaybeVar name = SubsM (\(env, _) ->
                     )
 
 
-getFunction :: FunName -> SubsM Primitive
+getFunction :: FunName -> SubsM P.Primitive
 getFunction name = SubsM (\(env, penv) ->
                     case Map.lookup name penv of
                       (Just p) -> Right (p, env)
@@ -204,7 +156,6 @@ evalArrayCompFor ident (StringVal s) ac =
     evalArrayCompFor ident (ArrayVal [StringVal [x] | x <- s]) ac
 evalArrayCompFor _ _ _ =
     fail "Array Comprehension iterator has to be an Array or String"
-
 
 runExpr :: Expr -> Either Error Value
 runExpr expr = case runSubsM (evalExpr expr) initialContext of
