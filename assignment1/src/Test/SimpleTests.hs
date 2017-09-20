@@ -110,6 +110,11 @@ acStartingWithIfTrue = runExpr (Compr (ACIf TrueConst (ACBody (Number 42)))) == 
 acStartingWithIfFalse :: Bool
 acStartingWithIfFalse = runExpr (Compr (ACIf FalseConst (ACBody (Assign "x" (Number 42))))) == runExpr (Array [])
 
+acNestedArrays :: Bool
+acNestedArrays = runExpr (Comma (Assign "xs" (Array [Number 1, Number 2])) 
+                         (Compr (ACFor "x" (Var "xs") (ACBody (Array [Var "x", Var "x"])))))
+                 == Right (ArrayVal [ArrayVal [IntVal 1, IntVal 1], ArrayVal [IntVal 2, IntVal 2]])
+
 
 -- Testcases
 spec :: Spec
@@ -144,4 +149,5 @@ spec = do
     it "Array comprehension with Strings" $ property acStrings
     it "Array comprehension with if clause first, evaluating to true" $ acStartingWithIfTrue
     it "Array comprehension with if clause first, evaluating to false" $ acStartingWithIfFalse
+    it "Array comprehension with nested Arrays" $ acNestedArrays
     

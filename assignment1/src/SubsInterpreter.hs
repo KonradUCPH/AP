@@ -2,6 +2,11 @@ module SubsInterpreter
        (
          Value(..)
        , runExpr
+       -- exporting additional components for testing monadic laws
+       , evalExpr
+       , initialContext
+       , runSubsM
+       , SubsM
        )
        where
 
@@ -144,18 +149,27 @@ evalArrayComp (ACIf expr ac) = do
 evalArrayCompFor :: Ident -> Value -> ArrayCompr -> SubsM Value
 evalArrayCompFor _ (ArrayVal []) _ = return (ArrayVal [])
 evalArrayCompFor ident (ArrayVal (x:xs)) ac =
-    do
-      putVar ident x
-      mv <- evalArrayComp ac
-      (ArrayVal mvs) <- evalArrayCompFor ident (ArrayVal xs) ac
-      -- accounting for nested for:
-      case mv of
-        (ArrayVal mv') -> return (ArrayVal (mv' ++ mvs))
-        _ -> return (ArrayVal (mv:mvs))
+        do
+          putVar ident x
+          v <- evalArrayComp ac
+          vs <- evalArrayCompFor ident (ArrayVal xs) ac
+          combineACForResult v vs ac
 evalArrayCompFor ident (StringVal s) ac =
-    evalArrayCompFor ident (ArrayVal [StringVal [x] | x <- s]) ac
+        evalArrayCompFor ident (ArrayVal [StringVal [x] | x <- s]) ac
 evalArrayCompFor _ _ _ =
-    fail "Array Comprehension iterator has to be an Array or String"
+        fail "Array Comprehension iterator has to be an Array or String"
+
+-- combines the result of the current and recursive array comp
+combineACForResult :: Value -> Value -> ArrayCompr -> SubsM Value
+combineACForResult v (ArrayVal vs) (ACBody _) = 
+  return (ArrayVal (v:vs)) -- preserve nested array
+combineACForResult v (ArrayVal vs) _ = 
+  case v of
+    (ArrayVal v') -> return (ArrayVal (v' ++ vs)) -- destroy nested array
+    _ -> return (ArrayVal (v:vs)) -- preserve nested array
+combineACForResult _ _ _ = fail ("unexpected error: evaluation of Array "
+                                ++ "Composition did not yield an array")
+
 
 runExpr :: Expr -> Either Error Value
 runExpr expr = case runSubsM (evalExpr expr) initialContext of
