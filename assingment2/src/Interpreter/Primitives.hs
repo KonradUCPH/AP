@@ -1,7 +1,7 @@
 {-
     A module containing the primitives for the subset interpreter
 -}
-module Primitives (
+module Interpreter.Primitives (
     Primitive,
     mkArray,
     add,

@@ -10,7 +10,7 @@ Expr1       ::= Ident '=' Expr1
 
 Expr2       ::= Expr3 Expr2'
 
-Expr2'      ::= '===' Expr3 | '<' Expr3 | e
+Expr2'      ::= '===' Expr3 Expr2' | '<' Expr3 Expr2'| e
 
 Expr3       ::= Expr4 Expr3opt
 

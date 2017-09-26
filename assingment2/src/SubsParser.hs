@@ -6,6 +6,7 @@ module SubsParser (
 
 import SubsAst
 import Parser.Impl
+import Text.Parsec.Error(ParseError)
 
 -- shouldn't need to change this
 parseFile :: FilePath -> IO (Either ParseError Expr)

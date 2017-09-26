@@ -1,18 +1,8 @@
-module SubsInterpreter
-       (
-         Value(..)
-       , runExpr
-       -- exporting additional components for testing monadic laws
-       , evalExpr
-       , initialContext
-       , runSubsM
-       , SubsM
-       )
-       where
+module Interpreter.Impl where
 
 import SubsAst
-import Value
-import qualified Primitives as P
+import Interpreter.Value
+import qualified Interpreter.Primitives as P
 
 -- You might need the following imports
 import Control.Monad

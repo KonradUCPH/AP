@@ -1,14 +1,21 @@
 module Parser.Impl where
 
 import SubsAst
-import Text.Parsec.String 
+import Text.Parsec.String
 import Text.Parsec (parse)
 import Text.Parsec.Combinator
 import Text.Parsec.Char
-import Text.Parsec.Error
+import Text.Parsec.Error(ParseError)
 import Text.Parsec.Prim hiding (token)
-import Control.Monad (void)
+import Control.Monad (when)
 import Data.Char (isPrint, isAlphaNum)
+
+
+parseString :: String -> Either ParseError Expr
+parseString s =
+    case parse pToEof "Parsing Error" s of
+        Right a -> Right a
+        Left e -> Left e
 
 -- eager parse
 munch :: (Char -> Bool) -> Parser String
@@ -24,31 +31,25 @@ token p = do
             pOptWhitespace
             return a
 
---parses the given symbol, including whitespace
+-- parses the given symbol, including whitespace
 symbol :: String -> Parser ()
 symbol s = do
-            token $ string s
+            _ <- token (string s)
             return ()
-               
+
 
 -- parses the given keyword, including whitespace
 keyword :: String -> Parser ()
-keyword s = token $ do 
-                        string s
+keyword s = token $ do
+                        _ <- string s
                         notFollowedBy alphaNum
 
 reservedWords :: [String]
 reservedWords = ["true", "false", "undefined", "for", "of", "if"]
 
-parseString :: String -> Either ParseError Expr
-parseString s = 
-    case parse pToEof "Parsing Error" s of
-        Right a -> Right a
-        Left e -> Left e
-
 pToEof :: Parser Expr
-pToEof = do 
-            pOptWhitespace -- handle whitespace at start of file 
+pToEof = do
+            pOptWhitespace -- handle whitespace at start of file
             expr <- pExpr
             eof -- check for eof after parsing succeeded
             return expr
@@ -56,8 +57,7 @@ pToEof = do
 pExpr :: Parser Expr
 pExpr = do
             e1 <- pExpr1
-            eCombined <- pExpr' e1
-            return $ eCombined
+            pExpr' e1
 
 pExpr' :: Expr -> Parser Expr
 pExpr' e1 = do
@@ -68,8 +68,9 @@ pExpr' e1 = do
                 return e1 -- epslilon expression
 
 pExpr1 :: Parser Expr
-pExpr1 =    
-        try ( do ident <- pIdent  -- try used for backtracking. Required because of it is.
+pExpr1 =
+        try ( do
+                 ident <- pIdent  -- try used for backtracking.
                  symbol "="
                  e <- pExpr1
                  return $ Assign ident e )
@@ -79,66 +80,63 @@ pExpr1 =
 pExpr2 :: Parser Expr
 pExpr2 = do
             e1 <- pExpr3
-            eCombined <- pExpr2' e1
-            return eCombined
+            pExpr2' e1
 
 pExpr2' :: Expr -> Parser Expr
 pExpr2' e1 = do
                 symbol "==="
-                e2 <- pExpr3 
-                return $ Call "===" [e1, e2]
+                e2 <- pExpr3
+                pExpr2' (Call "===" [e1, e2])
              <|>
              do
                 symbol "<"
                 e2 <- pExpr3
-                return $ Call "<" [e1, e2]
+                pExpr2' (Call "<" [e1, e2])
              <|>
                 return e1
 
 pExpr3 :: Parser Expr
 pExpr3 = do
-            e1 <- pExpr4 
-            eCombined <- pExpr3Opt e1
-            return eCombined
+            e1 <- pExpr4
+            pExpr3Opt e1
 
 pExpr3Opt :: Expr -> Parser Expr
 pExpr3Opt e1 = do
                 symbol "+"
                 e2 <- pExpr4
-                let eCombined = Call "+" [e1, e2] 
-                pExpr3Opt eCombined 
+                let eCombined = Call "+" [e1, e2]
+                pExpr3Opt eCombined
              <|>
              do
                 symbol "-"
                 e2 <- pExpr4
-                let eCombined = Call "-" [e1, e2] 
-                pExpr3Opt eCombined 
+                let eCombined = Call "-" [e1, e2]
+                pExpr3Opt eCombined
              <|>
                 return e1
 
 pExpr4 :: Parser Expr
 pExpr4 = do
-            e1 <- pExpr5 
-            eCombined <- pExpr4Opt e1
-            return eCombined
+            e1 <- pExpr5
+            pExpr4Opt e1
 
 pExpr4Opt :: Expr -> Parser Expr
 pExpr4Opt e1 = do
                 symbol "*"
-                e2 <- pExpr5 
-                let eCombined = Call "*" [e1, e2] 
-                pExpr4Opt eCombined 
+                e2 <- pExpr5
+                let eCombined = Call "*" [e1, e2]
+                pExpr4Opt eCombined
              <|>
              do
                 symbol "%"
-                e2 <- pExpr5 
-                let eCombined = Call "%" [e1, e2] 
-                pExpr4Opt eCombined 
+                e2 <- pExpr5
+                let eCombined = Call "%" [e1, e2]
+                pExpr4Opt eCombined
              <|>
                 return e1
 
 pExpr5 :: Parser Expr
-pExpr5 =    pNum 
+pExpr5 =    pNum
         <|> pString
         <|> try pTrue
         <|> try pFalse
@@ -150,44 +148,44 @@ pExpr5 =    pNum
 pNum :: Parser Expr
 pNum = do
         symbol "-"
-        num <- pDigits 
+        num <- pDigits
         return (Number ( - num))
        <|>
        do
-        num <- pDigits 
-        return (Number (num))
+        num <- pDigits
+        return (Number num)
 
 pString :: Parser Expr
 pString = token $ do
-                    string "'"
+                    _ <- string "'"
                     s <- pStringR ""
                     return (String s)
 
 pTrue :: Parser Expr
-pTrue = do 
+pTrue = do
            keyword "true"
-           return TrueConst 
+           return TrueConst
 
 pFalse :: Parser Expr
-pFalse = do 
+pFalse = do
            keyword "false"
-           return FalseConst 
+           return FalseConst
 
 pUndefined :: Parser Expr
-pUndefined = do 
+pUndefined = do
                 keyword "undefined"
-                return Undefined 
+                return Undefined
 
 pBracketedExpr :: Parser Expr
-pBracketedExpr = do 
+pBracketedExpr = do
                     symbol "("
                     expr <- pExpr
                     symbol ")"
                     return expr
 
 pExprIdent :: Parser Expr
-pExprIdent = do 
-                ident <- pIdent 
+pExprIdent = do
+                ident <- pIdent
                 pExprIdent' ident
 
 pExprIdent' :: Ident -> Parser Expr
@@ -217,12 +215,12 @@ pExprs' = do
             return []
 
 pExprArray :: Parser Expr
-pExprArray = do 
+pExprArray = do
                 symbol "["
                 pExprArray'
 
-pExprArray' :: Parser Expr 
-pExprArray' = try (do 
+pExprArray' :: Parser Expr
+pExprArray' = try (do
                     exprs <- pExprs
                     symbol "]"
                     return (Array exprs))
@@ -233,7 +231,7 @@ pExprArray' = try (do
                 return (Compr arrayFor)
 
 
-pArrayFor :: Parser ArrayCompr 
+pArrayFor :: Parser ArrayCompr
 pArrayFor = do
               keyword "for"
               symbol "("
@@ -244,32 +242,32 @@ pArrayFor = do
               ac <- pArrayCompr
               return (ACFor ident expr ac)
 
-pArrayIf :: Parser ArrayCompr 
-pArrayIf = do 
+pArrayIf :: Parser ArrayCompr
+pArrayIf = do
                keyword "if"
-               symbol "(" 
+               symbol "("
                expr <- pExpr1
                symbol ")"
                ac <- pArrayCompr
                return (ACIf expr ac)
 
-pArrayCompr :: Parser ArrayCompr 
-pArrayCompr =   try pArrayFor  
+pArrayCompr :: Parser ArrayCompr
+pArrayCompr =   try pArrayFor
               <|>
                 try pArrayIf
-              <|>  
+              <|>
                 do
                 e <- pExpr1
-                return (ACBody e) 
+                return (ACBody e)
 
 pIdent :: Parser Ident
 pIdent = token $ do
-                    c <- letter
-                    cs <- many $ satisfy isAlphaNumOrUnderscore 
-                    let ident = c:cs
-                    if ident `notElem` reservedWords
-                        then return $ ident
-                        else unexpected "A variable name can't be a reserved word!"
+            c <- letter
+            cs <- many $ satisfy isAlphaNumOrUnderscore
+            let ident = c:cs
+            if ident `notElem` reservedWords
+                then return ident
+                else unexpected "A variable name can't be a \reserved word!"
 
 
 isAlphaNumOrUnderscore :: Char -> Bool
@@ -291,16 +289,16 @@ pStringR s1 = do
                                 pStringR $ s1 ++ s2 ++ s3
                     c -> fail $ "Invalid character in string: \"" ++ [c] ++ "\""
 
--- called after a backslash has ben read   
-pBackshlashChar :: Parser String  
-pBackshlashChar = do 
+-- called after a backslash has ben read
+pBackshlashChar :: Parser String
+pBackshlashChar = do
                     interruptor2 <- anyToken
                     case interruptor2 of
                         'n' -> return "\n"
                         '\'' -> return "'"
                         't' -> return "\t"
                         '\\' -> return "\\"
-                        '\n' -> do  -- skip whitespace - not 
+                        '\n' -> do  -- skip whitespace - not
                                     pOptWhitespace
                                     return ""
                         _ -> fail "invalid backslash-sequence in a string"
@@ -314,7 +312,7 @@ stringInterruptor c = isPrint c
 pDigits :: Parser Int
 pDigits = token $ do
                     c <- many1 digit
-                    if length c <= 8 then 
+                    if length c <= 8 then
                         return $ read c
                     else
                         fail "Too many digits!"
@@ -324,20 +322,15 @@ pOptWhitespace :: Parser ()
 pOptWhitespace = do
                     a <- many $ oneOf " \n\t"
                     b <- many pComment
-                    if (length a) > 0 || (length b) > 0 then
-                        do 
-                          pOptWhitespace 
+                    when (not (null a) || not (null b)) (
+                        do
+                          pOptWhitespace
                           return ()
-                    else 
-                        return ()
+                        )
 
---parses a comment
+-- parses a comment
 pComment :: Parser String
 pComment = do
-            string "//" -- deliberately not used symbol to allow empty comments
-            s <- manyTill anyChar newline
-            return s
-
-
-
-
+            _ <- string "//" -- deliberately not used symbol
+                             -- to allow empty comments
+            manyTill anyChar newline
