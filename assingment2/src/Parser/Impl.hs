@@ -329,8 +329,14 @@ pOptWhitespace = do
                         )
 
 -- parses a comment
+-- parses a comment
 pComment :: Parser String
-pComment = do
-            _ <- string "//" -- deliberately not used symbol
-                             -- to allow empty comments
-            manyTill anyChar newline
+pComment =  try ( do
+              _ <- string "//" 
+              -- deliberately not used symbol to allow empty comments
+              manyTill anyChar newline) 
+          <|>
+            do
+              _ <- string "//" 
+              -- deliberately not used symbol to allow empty comments
+              manyTill anyChar eof 
