@@ -161,9 +161,9 @@ evalArrayCompFor _ _ _ =
 
 -- combines the result of the current and recursive array comp
 combineACForResult :: Value -> Value -> ArrayCompr -> SubsM Value
-combineACForResult v (ArrayVal vs) (ACBody _) = 
+combineACForResult v (ArrayVal vs) (ACBody _) =
   return (ArrayVal (v:vs)) -- preserve nested array
-combineACForResult v (ArrayVal vs) _ = 
+combineACForResult v (ArrayVal vs) _ =
   case v of
     (ArrayVal v') -> return (ArrayVal (v' ++ vs)) -- destroy nested array
     _ -> return (ArrayVal (v:vs)) -- preserve nested array
