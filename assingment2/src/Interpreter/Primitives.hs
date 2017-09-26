@@ -12,7 +12,7 @@ module Interpreter.Primitives (
     compareP
     ) where
 
-import Value
+import Interpreter.Value
 
 type Primitive = [Value] -> Either Error Value
 

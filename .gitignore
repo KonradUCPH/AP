@@ -1,4 +1,4 @@
 #stack working directories
 *.stack-work
-
+*.DS_Store
 *.zip

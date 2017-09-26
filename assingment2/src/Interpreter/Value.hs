@@ -1,4 +1,4 @@
-module Value  (
+module Interpreter.Value  (
     Value(..),
     Error
     ) where
