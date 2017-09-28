@@ -54,3 +54,32 @@ isNotOnFriendList(_, _, []).
 isNotOnFriendList(G, Name, [H|T]) :-
     different(G, H, Name),
     isNotOnFriendList(G, Name, T).
+
+/* popular (Graph, Name) is liked back by everyone*/
+popular(G, X) :-
+    getPersonAtom(G, X, Friends),
+    likedByEveryone(G, X, Friends).
+
+/* checks if X is liked by everyone on the List*/
+likedByEveryone(_, _, []).
+likedByEveryone(G, X, [H|T]) :-
+    likes(G, H, X),
+    likedByEveryone(G, X, T).
+
+/* outcast(Graph, Name) is not liked back by anyone*/
+outcast(G, X) :-
+    getPersonAtom(G, X, Friends),
+    dislikedByEveryone(G, X, Friends).
+
+/* Checks if X is disliked by everone on the list*/
+dislikedByEveryone(_, _, []).
+dislikedByEveryone(G, X, [H|T]) :-
+    dislikes(G, H, X),
+    dislikedByEveryone(G, X, T).
+
+
+/* friendly(Graph, Name) is liked back by anyone*/
+friendly(G, X) :-
+    getPersonAtom(G, X, Friends),
+    likedByEveryone(G, X, Friends).
+
