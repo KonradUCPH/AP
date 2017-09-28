@@ -24,18 +24,33 @@ pCompound(person(Name,Friends), Name, Friends).
 myMember(X, [X|_]).
 myMember(X, [_|T]) :- myMember(X, T).
 
+/* my implementation of select.
+    removes the given argument from the list*/
+mySelect(X, [X|XS], XS).
+mySelect(X, [Y|XS], [Y|YS]) :-
+    mySelect(X, XS, YS).
+
 /* likes(Graph, Name, Name)*/
 likes(G, X, Y) :-
     getPersonAtom(G, X, Friends),
     myMember(Y, Friends).
 
-/* are X and Y different members of G?*/
-different(G, X, Y) :-
-    select(X, G, G1),
-    select(Y, G1, _).
-
+/* are X and Y different members of G?
+    different(G, Name, Name)*/
+different(G, Nx, Ny) :-
+    getPerson(G, Nx, Px),
+    getPerson(G, Ny, Py),
+    mySelect(Px, G, G1),
+    mySelect(Py, G1, _).
 
 /* dislikes(Graph, Name, Name)*/
 dislikes(G, X, Y) :-
     likes(G, Y, X), % Y likes X
-    \+ likes(G, X, Y). % but X doesnt like Y
+    getPersonAtom(G, X, FriendsX), % get Friendlist of X
+    isNotOnFriendList(G, Y, FriendsX). % all on Xs friendlist are different from Y
+
+/* Checks that the given name is not on the list*/
+isNotOnFriendList(_, _, []).
+isNotOnFriendList(G, Name, [H|T]) :-
+    different(G, H, Name),
+    isNotOnFriendList(G, Name, T).
