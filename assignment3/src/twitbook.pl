@@ -147,6 +147,7 @@ indifferent(G, X, Y) :-
     notElem(G, Y, VS). % did we ever visit Y if yes, X admires Y?
 
 same_world(G, H, A) :-
+    translateGraph(G, H, A),
     translate(G, G, A, G1),
     equalSP(G1, H).
 
@@ -190,5 +191,33 @@ equalS([], []).
 equalS([X|XS], YS) :-
     mySelect(X, YS, YS1),
     equalS(XS, YS1).
+
+%sameWorld(G, H, A) :- 
+%.
+translateGraph(G, H, A) :- 
+    getTheList(G, NamesG), 
+    getTheList(H, NamesH),
+    combinationMaker(NamesG, NamesH, A).
+
+getTheList([], []).
+getTheList([person(Name,_)|T], [Name|NF]) :- getTheList(T, NF).
+
+combinationMaker(LA, LB, A) :-
+    permutation(LA, PLA), 
+    permutation(LB, PLB),
+    zip(PLA, PLB, A).
+
+permutation([], []).
+permutation(List, [Element | Permutation]) :-
+    mySelect(Element, List, Rest),
+    permutation(Rest, Permutation).
+
+zip([],[],[]).
+zip([LAH|LAT], [LBH|LBT], [(LAH,LBH)|R]) :-
+    zip(LAT, LBT, R).
+    
+
+
+
 
 

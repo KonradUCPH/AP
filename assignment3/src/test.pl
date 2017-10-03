@@ -24,6 +24,7 @@ a1([(kara,supergirl),
 
 g3([person(a,[b,c]), person(x,[y,z])]).
 g4([person(x,[z,y]), person(a,[c,b])]).
+g5([person(1,[2,3]), person(4,[5,6])]).
 
 
 :- begin_tests(twitbook).
