@@ -161,8 +161,6 @@ same_world(G, H, A) :-
     getTranslationTable(G, H, A),
     translateGraph(G, A, TG),
     equalSP(TG, H).
-
-
 /* Checks if two sets of persons are equal, ignoring order of persons and friends*/
 equalSP([],[]).
 equalSP([X|XS], YS) :-
@@ -233,6 +231,3 @@ permutation(List, [Element | Permutation]) :-
 zip([],[],[]).
 zip([LAH|LAT], [LBH|LBT], [(LAH,LBH)|R]) :-
     zip(LAT, LBT, R).
-    
-
-

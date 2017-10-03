@@ -1,0 +1,19 @@
+\select@language {english}
+\contentsline {section}{Description of the Assignment}{1}{section*.2}
+\contentsline {section}{Solution}{1}{section*.3}
+\contentsline {subsection}{Implementation}{1}{section*.4}
+\contentsline {subsection}{Source-code Organisation}{1}{section*.5}
+\contentsline {subsection}{Test Cases}{2}{section*.6}
+\contentsline {subsection}{How to Execute the Program}{2}{section*.7}
+\contentsline {paragraph}{}{2}{section*.8}
+\contentsline {paragraph}{}{2}{section*.9}
+\contentsline {section}{Implementation}{3}{section*.10}
+\contentsline {subsection}{Assumptions}{3}{section*.11}
+\contentsline {subsection}{Choice of Parsing Combinator Library}{3}{section*.12}
+\contentsline {subsection}{Use of Backtracking}{3}{section*.13}
+\contentsline {subsection}{Grammar}{3}{section*.14}
+\contentsline {subsection}{Eliminating Whitespace}{5}{section*.15}
+\contentsline {subsection}{Support of SubScript}{5}{section*.16}
+\contentsline {section}{Assessment}{6}{section*.17}
+\contentsline {subsection}{Correctness of Solution}{6}{section*.18}
+\contentsline {subsection}{Summary of Code Quality}{6}{section*.19}

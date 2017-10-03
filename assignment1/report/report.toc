@@ -1,0 +1,21 @@
+\select@language {english}
+\contentsline {section}{Description of the Assignment}{1}{section*.2}
+\contentsline {section}{Solution}{1}{section*.3}
+\contentsline {subsection}{Implementation}{1}{section*.4}
+\contentsline {subsection}{Source-code Organisation}{1}{section*.5}
+\contentsline {subsection}{Test Cases}{2}{section*.6}
+\contentsline {subsection}{How to Execute the Program}{2}{section*.7}
+\contentsline {paragraph}{}{2}{section*.8}
+\contentsline {paragraph}{}{2}{section*.9}
+\contentsline {section}{Implementation}{3}{section*.10}
+\contentsline {subsection}{Assumptions}{3}{section*.11}
+\contentsline {subsection}{Choice of Algorithms and Data Structures}{3}{section*.12}
+\contentsline {subsection}{Support of Array Comprehensions}{3}{section*.13}
+\contentsline {subsection}{The Monad SubsM}{3}{section*.14}
+\contentsline {paragraph}{}{3}{section*.15}
+\contentsline {paragraph}{}{3}{section*.16}
+\contentsline {paragraph}{}{4}{section*.17}
+\contentsline {subsection}{Satisfaction of the Monad Laws}{4}{section*.18}
+\contentsline {section}{Assessment}{5}{section*.19}
+\contentsline {subsection}{Correctness of Solution}{5}{section*.20}
+\contentsline {subsection}{Summary of Code Quality}{5}{section*.21}

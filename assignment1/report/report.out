@@ -1,0 +1,15 @@
+\BOOKMARK [1][-]{section*.2}{Description of the Assignment}{}% 1
+\BOOKMARK [1][-]{section*.3}{Solution}{}% 2
+\BOOKMARK [2][-]{section*.4}{Implementation}{section*.3}% 3
+\BOOKMARK [2][-]{section*.5}{Source-code Organisation}{section*.3}% 4
+\BOOKMARK [2][-]{section*.6}{Test Cases}{section*.3}% 5
+\BOOKMARK [2][-]{section*.7}{How to Execute the Program}{section*.3}% 6
+\BOOKMARK [1][-]{section*.10}{Implementation}{}% 7
+\BOOKMARK [2][-]{section*.11}{Assumptions}{section*.10}% 8
+\BOOKMARK [2][-]{section*.12}{Choice of Algorithms and Data Structures}{section*.10}% 9
+\BOOKMARK [2][-]{section*.13}{Support of Array Comprehensions}{section*.10}% 10
+\BOOKMARK [2][-]{section*.14}{The Monad SubsM}{section*.10}% 11
+\BOOKMARK [2][-]{section*.18}{Satisfaction of the Monad Laws}{section*.10}% 12
+\BOOKMARK [1][-]{section*.19}{Assessment}{}% 13
+\BOOKMARK [2][-]{section*.20}{Correctness of Solution}{section*.19}% 14
+\BOOKMARK [2][-]{section*.21}{Summary of Code Quality}{section*.19}% 15

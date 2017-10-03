@@ -1,0 +1,103 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[english, science, small]{ku-frontpage}
+\usepackage[utf8]{inputenc}
+%\usepackage{minted}
+
+\providecolor{textgreen}{RGB}{59, 158, 72}
+\providecolor{textblue}{RGB}{15, 100, 255}
+\providecolor{textred}{RGB}{255, 51, 66}
+
+\usepackage{listings}
+\lstdefinestyle{Bash}
+{language=bash,
+	keywordstyle=\color{blue},
+	basicstyle=\ttfamily,
+	morekeywords={peter@kbpet},
+	alsoletter={:~\$},
+	morekeywords=[2]{peter@kbpet:},
+	keywordstyle=[2]{\color{red}},
+	literate={\$}{{\textcolor{red}{\$}}}1 
+	{:}{{\textcolor{red}{:}}}1
+	{~}{{\textcolor{red}{\textasciitilde}}}1,
+}
+
+\lstdefinelanguage[Modern]{Haskell}[]{Haskell}{%
+	alsoletter={'},
+	%classoffset=0,
+	keywords=[1]{case,class,data,deriving,do,else,if,import,in,infixl,infixr,instance,let,
+		module,of,primitive,then,type,where,family,newtype},
+	keywordstyle=[1]\color{textblue},
+	%classoffset=1,
+	morekeywords=[2]{->,|,=>,::,[,],\,*,<-},
+	otherkeywords={->,|,=>,::,[,],\,*,<-},
+	keywordstyle=[2]\color{textblue},
+}
+
+\setlength\arraycolsep{2 pt}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{0}
+
+\author{Per Steffen Czolbe, Konrad Gnoinski}
+\title{Advanced Programming}
+\subtitle{Assignment 3: Analyzing TwitBook} % No subtitle
+\date{Handed in: \today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+
+\section{Description of the Assignment}
+
+This assignment is about Analyzing TwitBook which is a a set of relationships between group of people. 
+
+\section{Solution}
+This section gives a brief overview about the structure of the solution and how to execute the code.
+
+\subsection{Implementation}
+This solution of the assignment is implemented in a functional programming language - Prolog. SWIProlog is used in this assignment. 
+
+\subsection{Source-code Organisation}
+The code is organised in just two files:
+\begin{itemize}
+	\item \texttt{src/twitbook.pl}: the file containing all the required predicates as well as definition of twitbook structures. 
+	\item \texttt{src/tests.pl}: the file containing static tests of the predicates functionality.
+\end{itemize}
+
+\subsection{Test Cases}
+The \texttt{src/test.pl} file contains multiple tests. The test framework used is \texttt{PL-Unit}. In order to validate the tests :
+\begin{lstlisting}[style=Bash]
+$ [twitbook], [tests].
+$ run_tests.
+\end{lstlisting}
+
+\subsection{How to Execute the Program}
+The predicates can be imported from the \texttt{src/twitbook.pl} file. Our predicates were made with use of SWIProlog. Calling predicates is performed by e.g. :
+\begin{lstlisting}[style=Bash]
+$ [test], [twitbook].
+$ g1(G), likes(G, kara, oliver).
+\end{lstlisting}
+
+\section{Implementation}
+A description of the implementation.
+
+\subsection{Assumptions}
+We assume that graph always would be given and our code would not be asked to generate graph with use of other parameters of the predicate. Mainly, it does not make a common sense to generate graph with use of e.g. likes(G,X,Y) predicate, when only X and Y would be provided. 
+
+\section{Assessment}
+This section contains the assessment of the presented solution.
+
+
+\subsection{Correctness of Solution}
+Based on the extensive tests, analyzing the code we assume the solution is likely to be correct.
+\\
+Additionally, the solutions passed the Online TA test.
+
+\subsection{Summary of Code Quality}
+Based on the extensive tests, we do believe that the functionality of this set of predicates matches the functionality specified in the assignment. 
+
+The quality of the code could be improved by using more functions from the Prolog standard library, especially using some of the restricted operators.  However, that is our first experience in the new language, so we find it beneficial to be restricted from use of build in predicates. That we need to fully understand basics of a language, without being artificially pushed further by the use of complex predicates that are a closed box for us.  Predicate \texttt{different\_world} was not implemented.
+
+
+\end{document}

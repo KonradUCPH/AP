@@ -1,0 +1,105 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[english, science, small]{ku-frontpage}
+\usepackage[utf8]{inputenc}
+
+\usepackage{listings}
+\lstdefinestyle{Bash}
+{language=bash,
+	keywordstyle=\color{blue},
+	basicstyle=\ttfamily,
+	morekeywords={peter@kbpet},
+	alsoletter={:~\$},
+	morekeywords=[2]{peter@kbpet:},
+	keywordstyle=[2]{\color{red}},
+	literate={\$}{{\textcolor{red}{\$}}}1 
+	{:}{{\textcolor{red}{:}}}1
+	{~}{{\textcolor{red}{\textasciitilde}}}1,
+}
+
+\setlength\arraycolsep{2 pt}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{0}
+
+\author{Per Steffen Czolbe, Konrad Gnoinski}
+\title{Advanced Programming}
+\subtitle{Assignment 0} % No subtitle
+\date{Handed in: \today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\section{Assignment}
+To fulfil the assignment 0: ``Look at these Curves", a library for performing multiple actions on \texttt{Curves} has to be implemented. To fulfil the assignment 0: ``Look at these Curves", a library for performing multiple actions on \texttt{Curves} has to be implemented. A piecewise linear curve is a nonempty sequence of n points P\textsubscript{0}, P\textsubscript{1}, ... , P\textsubscript{n - 1}, connected by a sequence of linear segments: P\textsubscript{0}P\textsubscript{1}, P1\textsubscript{1}P\textsubscript{2}, ... , P\textsubscript{n - 2}P\textsubscript{n - 1}. We call P\textsubscript{0} the starting point, and P\textsubscript{n - 1} the end point of the curve.
+
+\subsection{Assessment: Ensuring Curves are never Empty}
+Part of the assignment is the definition of the data-type for \texttt{Curve}. A \texttt{Curve} is a set of connected \texttt{Points}. A \texttt{Curve} is never empty, it always consists of at least one point.
+ 
+\paragraph{}
+The constructor-function \texttt{curve :: Point -> [Point] -> Curve} mandated by the assignment guaranties that \texttt{Curve} is never empty. While the List of \texttt{Points} can be empty, the single starting \texttt{Point} passed as a parameter ensures that there is always at least one \texttt{Point} in lists created with this function.
+
+\paragraph{}
+For the definition of the data-type \texttt{Curve} multiple options exist. The following sections compares three of them.
+
+\begin{enumerate}
+	
+\item A possible implementation for \texttt{Curve} would be \texttt{type Curve = [Point]}. While the list \texttt{Points} in the data-type definition could be empty, resulting in a \texttt{Curve} without a single \texttt{Point}, the constructor-function \texttt{curve :: Point -> [Point] -> Curve} still ensures that only \texttt{Curves} with at least one \texttt{Point} are created. However, this approach has the flaw that a client can just call functions of the \texttt{Curve} module by passing an empty list instead of a \texttt{Curve}, resulting in problems with empty \texttt{Curves}. 
+
+\item A better solution is defining \texttt{Curve} as \texttt{newtype Curve = Curve [Point]}. This way, an empty list passed as an argument does not qualify as a \texttt{Curve}. Clients are prevented from creating their own \texttt{Curve} via the constructor, and need to create curves via the exported constructor-function \texttt{curve :: Point -> [Point] -> Curve}, thus ensuring that clients can not create empty \texttt{Curves}.
+
+However, this definition still allows for empty \texttt{Curves} to be created in the \texttt{Curve} Module. It relies on adherence to the programming practice of not  creating empty \texttt{Curves} within the \texttt{Curve} module. 
+
+\item 
+
+To enforce \texttt{Curves} with at least one \texttt{Point} even for code inside the \texttt{Curve} Module, a \texttt{Curve} could be defined as \texttt{data Curve = Point [Point]}. Now there is no possibility of a \texttt{Curve} having fever than one \texttt{Point}. However, this approach requires more overhead for coding operations working on a \texttt{Curve}. Standard functions like \texttt{map} and \texttt{fold} require a list of all \texttt{Points} to work on. Declaring the starting \texttt{Point} of a \texttt{Curve} separately from the remaining \texttt{Points} makes using these functions more cumbersome.
+
+\end{enumerate}
+
+\paragraph{}
+After consideration of these options, this implementation of the \texttt{Curve} library chose the 2\textsuperscript{nd} option.
+
+\section{Implementation}
+This solution of the assignment is implemented in Haskell. This section gives an overview about how the code is organised, how to execute it and how to test it.
+
+\subsection{Files}
+The code is organised in multiple files:
+\begin{itemize}
+	\item \texttt{src/Curves.hs}: a file containing the \texttt{Curves} module.
+	\item \texttt{src/test/PointSpec.hs}: a file containing tests for \texttt{Point} and associated functions
+	\item \texttt{src/test/CurveSpec.hs}: a file containing tests for \texttt{Curve} and associated functions
+	\item \texttt{src/test/Spec.hs}: a file containing directives for the Hspec automatic test discovery
+\end{itemize}
+
+\subsection{How to execute the Module}
+The \texttt{Curves} module can be imported into any Haskell program and executed alongside that program. Alternatively, it can be loaded into the GCHi, allowing the user to call the exported functions of the \texttt{Curves} module interactively.
+
+
+\subsection{Testing the Module}
+Next to being able to test the \texttt{Curves} module interactively, test files are provided in the \texttt{src/test} directory. The test files depend on the testing framework \href{http://hspec.github.io/}{HSpec}.
+\\
+\\
+\noindent When the entire project is available, all test cases across all test files can be executed by using stack. After navigating to the project directory, execute:
+
+\begin{lstlisting}[style=Bash]
+$ stack test .
+\end{lstlisting}
+
+\noindent Alternatively, test cases of single files can be executed by opening them in GHCi and calling their main function interactively:
+
+\begin{lstlisting}[style=Bash]
+$ ghci src/test/CurveSpec.hs
+*Main> :main
+\end{lstlisting}
+
+
+\noindent  The file IO and SVG methods were tested interactively. No automated tests are implemented for these functions.
+
+\noindent Additionally, the online-TA at \url{find.incorrectness.dk} was used for testing the completed solution.
+
+\subsection{Test Results}
+The \texttt{Curves} module passed all mentioned tests.
+
+
+
+\end{document}

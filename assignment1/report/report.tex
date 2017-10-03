@@ -1,0 +1,162 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[english, science, small]{ku-frontpage}
+\usepackage[utf8]{inputenc}
+%\usepackage{minted}
+
+\providecolor{textgreen}{RGB}{59, 158, 72}
+\providecolor{textblue}{RGB}{15, 100, 255}
+\providecolor{textred}{RGB}{255, 51, 66}
+
+\usepackage{amsmath}
+
+\usepackage{listings}
+\lstdefinestyle{Bash}
+{language=bash,
+	keywordstyle=\color{blue},
+	basicstyle=\ttfamily,
+	morekeywords={peter@kbpet},
+	alsoletter={:~\$},
+	morekeywords=[2]{peter@kbpet:},
+	keywordstyle=[2]{\color{red}},
+	literate={\$}{{\textcolor{red}{\$}}}1 
+	{:}{{\textcolor{red}{:}}}1
+	{~}{{\textcolor{red}{\textasciitilde}}}1,
+}
+
+\lstdefinelanguage[Modern]{Haskell}[]{Haskell}{%
+	alsoletter={'},
+	%classoffset=0,
+	keywords=[1]{case,class,data,deriving,do,else,if,import,in,infixl,infixr,instance,let,
+		module,of,primitive,then,type,where,family,newtype},
+	keywordstyle=[1]\color{textblue},
+	%classoffset=1,
+	morekeywords=[2]{->,|,=>,::,[,],\,*,<-},
+	otherkeywords={->,|,=>,::,[,],\,*,<-},
+	keywordstyle=[2]\color{textblue},
+}
+
+\setlength\arraycolsep{2 pt}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{0}
+
+\author{Per Steffen Czolbe, Konrad Gnoinski}
+\title{Advanced Programming}
+\subtitle{Assignment 1: Subs Interpreter} % No subtitle
+\date{Handed in: \today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\section{Description of the Assignment}
+This assignment is about implementing an interpreter for a conservative subset of Mozilla’s JavaScript implementation, including list comprehensions, which we will call SubScript. The interpreter reads an abstract syntax tree and returns the interpreted values.
+
+\section{Solution}
+This section gives a brief overview about the structure of the solution and how to execute the code.
+
+\subsection{Implementation}
+This solution of the assignment is implemented in Haskell.
+
+\subsection{Source-code Organisation}
+The code is organised in multiple files:
+\begin{itemize}
+	\item \texttt{src/Primitives.hs}: a file containing the primitive functions of the SubScript language.
+	\item \texttt{src/Subs.hs}: the file containing the main function.
+	\item \texttt{src/SubsAst.hs}: the file containing the abstract syntax tree, represented by the data type \texttt{Expr}
+	\item \texttt{src/SubsIntepreter.hs}: the heart of the application: the interpreter.
+	\item \texttt{src/Valu.hs}: the file containing the data type \texttt{Value}.
+	\item \texttt{src/Test/MonadLawsTest.hs}: a file containing tests to assure adherence to the monadic laws
+	\item \texttt{src/Test/SimpleTests.hs}: a file containing tests of the interpreter functionality.
+\end{itemize}
+
+\subsection{Test Cases}
+The \texttt{src/Test} directory contains multiple tests. The test framework used for running multiple tests is \texttt{HSpec}. For propery based testing, \texttt{QuickCheck} is used.
+
+\subsection{How to Execute the Program}
+The interpreter can be compiled using the \texttt{src/Subs.hs} file as the primary component. The compiled program can be executed by passing a file containing the abstract syntax tree as an argument:
+\begin{lstlisting}[style=Bash]
+$ gci Subs.hs
+$ ./Subs <filename>
+\end{lstlisting}
+
+\paragraph{}
+Alternatively, the \texttt{SubsInterpreter} module can be loaded into the \texttt{ghci}. This way the function \texttt{runExpr} can be called with an expression. The interpreted value is returned.
+
+\paragraph{}
+The tests can be run similar to the mentioned ways, just using the files or modules from the \texttt{src/Test} directory instead.
+
+\pagebreak
+\section{Implementation}
+A description of the implementation.
+
+\subsection{Assumptions}
+The implementation of the interpreter is based on the assumption that its behaviour is similar to firefox's javascript intepreter. However, the presented interpreter does not attempt to mirror the functionality of the javascript interpreter exactly. Instead of focusing on the details of edge-cases in javascript, this solution has been written with the goal of learning haskell and not javascript. Conseuently, it  focuses on getting the major features of js right, while omitting the weird details. 
+
+\subsection{Choice of Algorithms and Data Structures}
+This solution is based on the handed out code skeleton, which dictates the data structure and general organization of the code.
+
+
+\subsection{Support of Array Comprehensions}
+This solution supports the full functionality of list comprehensions, as specified by the assignment.
+
+\subsection{The Monad SubsM}
+
+This is the implementation of the SubsM monad used in this solution:
+\begin{lstlisting}[language={[Modern]Haskell}]
+newtype SubsM a = SubsM {runSubsM :: Context -> Either Error (a, Env)}
+
+instance Monad SubsM where
+return x = SubsM ( \(env, _) -> Right (x, env) )
+m >>= f  = SubsM ( \c -> case runSubsM m c of
+Left e          -> Left e
+Right (a, env') -> let (_, penv) = c
+c' = (env', penv)
+in runSubsM (f a) c'
+)
+fail s = SubsM ( \_ -> Left s )
+\end{lstlisting}
+
+The \texttt{SubsM} monad is used by the interpreter for two main features:
+\begin{itemize}
+	\item Providing a simple and easy to use way to handle errors during the interpretation. 
+	\item Storing the state of the interpreter. A state is necessary to store and retrieve the value of variables. 
+\end{itemize}
+
+To account for both these requirements, the monad \texttt{SubsM} has both a state, indicated by its signature as a function, and can return either an error (\texttt{Either Left}) or a correct result (\texttt{Right}).
+
+\paragraph{}
+The \texttt{return} operation follows the signature of the \texttt{return} operator. It takes a value of type a, indicated by the parameter x, and returns a monad \texttt{SubsM} with the value x wrapped into it. The Right side is returned, indicating that this is not an error case. The environment is propagated without being changed.
+
+\paragraph{}
+The \texttt{>>=} operator binds a function of type \texttt{f :: a -> m b} to the monad. It "runs" the given monad \texttt{m} with the context, and checks for the type of the result. If the result is a \texttt{Left}, an error happened. In this case no further action is performed, the error is propagated.
+If the monad does not return in a state of error, the value \texttt{a} and the updated variable environment \texttt{env'} is retrieved. A new context \texttt{c'} is created and the monad is executed again with the new context \texttt{c'} and the result of \texttt{f a}, which applies the function \texttt{f} to \texttt{a}.
+
+\paragraph{}
+The \texttt{fail} operator is similar to the return operator, but it is used in the event of an error. Instead of passing a value to wrap into the monad, a string describing the error is given. As the monad can handle errors thanks to the \texttt{Either Error (a, Env)} signature, the implementation of \texttt{fail} just wraps a \texttt{Left Error} into the monad.
+
+\subsection{Satisfaction of the Monad Laws}
+Any monad should adhere to the three monad laws of left identity, right identity and associativity.
+\\
+To test the accordance of the \texttt{SubsM} monad to these laws, a test case for each law is implemented in the \texttt{src/Test/MonadLawsTest.hs} file. While these tests are not a formal proof, they do provide some evidence of compliance with the laws.
+
+
+\pagebreak
+\section{Assessment}
+This section contains the assessment of the presented solution.
+
+
+\subsection{Correctness of Solution}
+Based on the extensive tests, including property based tests performed with QuickCheck, we assume the solution is likely to be correct.
+\\
+Additionally, the solutions passed the Online TA test.
+
+\subsection{Summary of Code Quality}
+Based on the tests, we do believe that the submited program functions like specified in the assignment. However, the quality of the code and test cases could be significantly improved, for example by using QuickCheck more extensively to generate random expressions, or by using more functions from the haskell standard library instead of implementing our own functions. Due to time constraint of the assignment, we were not able to improve the code quality further.
+
+\begin{align*}
+	jhsd &= sf \\
+	&| \; kfssdsadasdas
+\end{align*}
+
+\end{document}

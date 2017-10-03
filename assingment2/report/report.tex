@@ -1,0 +1,231 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[english, science, small]{ku-frontpage}
+\usepackage[utf8]{inputenc}
+%\usepackage{minted}
+
+\providecolor{textgreen}{RGB}{59, 158, 72}
+\providecolor{textblue}{RGB}{15, 100, 255}
+\providecolor{textred}{RGB}{255, 51, 66}
+
+\usepackage{amsmath}
+\DeclareMathSymbol{\mlq}{\mathord}{operators}{``}
+\DeclareMathSymbol{\mrq}{\mathord}{operators}{`'}
+
+\newcommand*{\escape}[1]{\texttt{\textbackslash#1}}
+
+\usepackage{listings}
+\lstdefinestyle{Bash}
+{language=bash,
+	keywordstyle=\color{blue},
+	basicstyle=\ttfamily,
+	morekeywords={peter@kbpet},
+	alsoletter={:~\$},
+	morekeywords=[2]{peter@kbpet:},
+	keywordstyle=[2]{\color{red}},
+	literate={\$}{{\textcolor{red}{\$}}}1 
+	{:}{{\textcolor{red}{:}}}1
+	{~}{{\textcolor{red}{\textasciitilde}}}1,
+}
+
+\lstdefinelanguage[Modern]{Haskell}[]{Haskell}{%
+	alsoletter={'},
+	%classoffset=0,
+	keywords=[1]{case,class,data,deriving,do,else,if,import,in,infixl,infixr,instance,let,
+		module,of,primitive,then,type,where,family,newtype},
+	keywordstyle=[1]\color{textblue},
+	%classoffset=1,
+	morekeywords=[2]{->,|,=>,::,[,],\,*,<-},
+	otherkeywords={->,|,=>,::,[,],\,*,<-},
+	keywordstyle=[2]\color{textblue},
+}
+
+\setlength\arraycolsep{2 pt}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{0}
+
+\author{Per Steffen Czolbe, Konrad Gnoinski}
+\title{Advanced Programming}
+\subtitle{Assignment 2: Subs Parser} % No subtitle
+\date{Handed in: \today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\section{Description of the Assignment}
+This assignment is about implementing a Parser for a conservative subset of Mozilla’s JavaScript implementation, including list comprehensions, which we will call SubScript. The Parser reads a file written in the SubScript syntax and parses it to a abstract syntax tree.
+
+\section{Solution}
+This section gives a brief overview about the structure of the solution and how to execute the code.
+
+\subsection{Implementation}
+This solution of the assignment is implemented in Haskell.
+
+\subsection{Source-code Organisation}
+The code is organised in multiple files:
+\begin{itemize}
+	\item \texttt{src/Subs.hs}: the file containing the main function of the programm: Parsing a file.
+	\item \texttt{src/SubsPArser.hs}: the module exporting the parser functions.
+	\item \texttt{src/Parser/Impl.hs}: a file containing the implementation of the Parser.
+	\item \texttt{src/Parser/SubsAst.hs}: a file containing the abstarct syntax tree.
+	\item \texttt{src/Parser/Test/SimpleTests.hs}: a file containing static tests of the interpreter functionality.
+	\item \texttt{src/Parser/Test/quickCheckTests.hs}: a file containing tests with expressions randomised by quickcheck.
+\end{itemize}
+
+\subsection{Test Cases}
+The \texttt{src/Parser/Test} directory contains multiple tests. The test framework used is \texttt{HSpec}. For property based testing, \texttt{QuickCheck} is used.
+
+\subsection{How to Execute the Program}
+The program can be compiled using the \texttt{src/Subs.hs} file as the primary component. The compiled program can be executed by passing a file containing the SubScript code as an argument:
+\begin{lstlisting}[style=Bash]
+$ gci Subs.hs
+$ ./Subs <filename>
+\end{lstlisting}
+
+\paragraph{}
+Alternatively, the \texttt{SubsParser} module can be loaded into the \texttt{ghci}. This way the function \texttt{parseString} can be called with a string representing the SubScript programm. The interpreted expression is returned.
+
+\paragraph{}
+The tests can be run similar to the mentioned ways, just using the files or modules from the \texttt{src/Parser/Test} directory instead.
+
+\pagebreak
+\section{Implementation}
+A description of the implementation.
+
+\subsection{Assumptions}
+We assume the parser should be implemented according to the principles and code constructs shown in the lecture. This might not be the most runtime efficient or source-code compact solution, but helps greatly to understand the basics of parser combinators.
+
+\subsection{Choice of Parsing Combinator Library} %{Choice of Algorithms and Data Structures}
+There are two parser combinator libraries to choose from: ReadP and Parsec. Table \ref{table} gives a short overview of the benefits of each of them.
+
+Based on this selection, we chose Parsec to implement this solution. The precise error messages have proven to be invaluable during the implementation and testing of the parser.
+
+\begin{table}[]
+	\centering
+	\caption{Comparison of Parser Combinator Libraries for Haskell}
+	\label{table}
+	\begin{tabular}{l|l}
+		ReadP & Parsec\\ \hline
+		No error messages& Precise error messages \\
+		List based, backtracking & No backtracking by default \\
+		
+	\end{tabular}
+\end{table}
+
+
+\subsection{Use of Backtracking}
+Backtracking parsers pose the risk of space leaks [Leijen, 2001]. Due to this, parsec does not offer backtracking by default. Instead, the user has to account for possible areas of backtracking explicitly and mark then with parsecs \texttt{try}-statement.
+
+To avoid backtracking as much as possible, the grammar used was left-factored. This removes common factors from the left of expressions, and thus reduces the amount of backtracking required.
+
+However, there are still some instances that mandate backtracking due to the similarity of keywords and identities. Both are strings which are not marked otherwise (such as  'quotationmarks' on strings in javascript), and have the potential to be quite similar. For example, \texttt{false} can get parsed as an ident, reading in the entire symbol. Only after it has been read entirely, the symbol can be evaluated. The evaluation fails, as \texttt{false} is an invalid ident. But to parse it as a constant later on, the parser needs to backtrack to a state before it started parsing the first letter of \texttt{false}. In this case, a \texttt{try} statement is necessary.
+
+This solution uses \texttt{try} statements on parsing the ident, and all keywords that can appear in the same instances as ident (\texttt{true, false, undefined}).
+
+\subsection{Grammar}
+This is the grammar implemented in the parser. It was obtained by performing these steps on the original grammar:
+\begin{itemize}
+	\item Establishing precedence of operators
+	\item Establishing associativity of operators
+	\item Elimination of left recursion
+	\item Left factoring
+\end{itemize}
+
+\begin{align*}
+Expr        ::=& Expr1 \; Expr'\\
+\\
+Expr'       ::=& \; \mlq,\mlq \; Expr \\
+&| \; \epsilon\\
+\\
+Expr1       ::=& Ident \; \mlq=\mlq\;  Expr1 \\
+&| \; Expr2\\
+\\
+Expr2       ::=& Expr3 \; Expr2'\\
+\\
+Expr2'      ::=& \mlq===\mlq Expr3 \; Expr2' \\
+&| \; \mlq<\mlq Expr3 \; Expr2'\\
+&| \; \epsilon\\
+\\
+Expr3       ::=& Expr4 \; Expr3opt\\
+\\
+Expr3opt    ::=& \mlq+\mlq Expr4 \; Expr3opt \\
+&| \; \mlq-\mlq Expr4 \; Expr3opt\\
+&| \; \epsilon\\
+\\
+Expr4       ::=& ExprX \; Expr4opt\\
+\\
+Expr4opt    ::=& \mlq*\mlq Expr5 \; Expr4opt \\
+&| \; \mlq \% \mlq Expr5 \; Expr4opt \\
+&| \; \epsilon\\
+\\
+Expr5       ::=& Number\\
+&| \; String\\
+&| \; \mlq true \mlq\\
+&| \; \mlq false \mlq\\
+&| \; \mlq undefined \mlq\\
+&| \; ExprIdent\\
+&| \; ExprBracet\\
+&| \; \mlq(\mlq Expr \mlq)\mlq\\
+\end{align*}
+
+
+\begin{align*}
+ExprIdent   ::=& Ident \; ExprIdent'\\
+\\
+ExprIdent'  ::=& \mlq(\mlq Exprs \mlq)\mlq \\
+&| \; \epsilon\\
+\\
+ExprBracet  ::=& \mlq[\mlq ExprBracet'\\
+\\
+ExprBracet' ::=& Exprs \mlq]\mlq \\
+&| \; ArrayFor \mlq]\mlq\\
+\\
+Exprs       ::=& Expr1 \; CommaExprs\\
+&| \; \epsilon\\
+\\
+CommaExprs  ::=& \mlq,\mlq Expr1 \; CommaExprs \\
+&| \; \epsilon\\
+\\
+ArrayFor    ::=& \mlq for \mlq \; \mlq(\mlq Ident \mlq of \mlq Expr1 \mlq)\mlq ArrayCompr \\
+\\
+ArrayIf     ::=& \mlq if \mlq \; \mlq(\mlq Expr1 \mlq)\mlq \\
+\\
+ArrayCompr  ::=& Expr1\\
+&| \; ArrayFor \\
+&| \; ArrayIf\\
+\\
+Number      ::=& \mlq-\mlq Digits \\
+&| \; Digits\\
+\\
+Digits      ::=&\\
+Ident       ::=&\\
+String      ::=&\\
+\end{align*}
+
+\subsection{Eliminating Whitespace}
+Whitespaces can appear between any two tokens. Valid whitespaces are spaces, \texttt{\escape{n} \escape{t}} and comments.
+
+This parser follows the strategy of reading all whitespace at the start of the file, and then reading it after each token. This is more runtime-efficient than doing it the other way around, as matching symbols is much quicker when the parser does not have to account for leading whitespaces in each case.
+
+\subsection{Support of SubScript}
+
+This parser supports the full functionallity of SubScript.
+
+\pagebreak
+\section{Assessment}
+This section contains the assessment of the presented solution.
+
+
+\subsection{Correctness of Solution}
+Based on the extensive tests, including property based tests performed with QuickCheck, we assume the solution is likely to be correct.
+\\
+Additionally, the solutions passed the Online TA test.
+
+\subsection{Summary of Code Quality}
+Based on the extensive tests, we do believe that the functionality of this parser matches the functionality specified in the assignment. 
+
+The quality of the code could be improved by using more functions from the haskell standard library or the parsec library. However, we selected this more "low level" implementation, as it is closer to the code examples from the lecture and more comprehensible.
+
+
+\end{document}

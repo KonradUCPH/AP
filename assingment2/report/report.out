@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section*.2}{Description of the Assignment}{}% 1
+\BOOKMARK [1][-]{section*.3}{Solution}{}% 2
+\BOOKMARK [2][-]{section*.4}{Implementation}{section*.3}% 3
+\BOOKMARK [2][-]{section*.5}{Source-code Organisation}{section*.3}% 4
+\BOOKMARK [2][-]{section*.6}{Test Cases}{section*.3}% 5
+\BOOKMARK [2][-]{section*.7}{How to Execute the Program}{section*.3}% 6
+\BOOKMARK [1][-]{section*.10}{Implementation}{}% 7
+\BOOKMARK [2][-]{section*.11}{Assumptions}{section*.10}% 8
+\BOOKMARK [2][-]{section*.12}{Choice of Parsing Combinator Library}{section*.10}% 9
+\BOOKMARK [2][-]{section*.13}{Use of Backtracking}{section*.10}% 10
+\BOOKMARK [2][-]{section*.14}{Grammar}{section*.10}% 11
+\BOOKMARK [2][-]{section*.15}{Eliminating Whitespace}{section*.10}% 12
+\BOOKMARK [2][-]{section*.16}{Support of SubScript}{section*.10}% 13
+\BOOKMARK [1][-]{section*.17}{Assessment}{}% 14
+\BOOKMARK [2][-]{section*.18}{Correctness of Solution}{section*.17}% 15
+\BOOKMARK [2][-]{section*.19}{Summary of Code Quality}{section*.17}% 16

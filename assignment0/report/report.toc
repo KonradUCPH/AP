@@ -1,0 +1,11 @@
+\select@language {english}
+\contentsline {section}{Assignment}{1}{section*.2}
+\contentsline {subsection}{Assessment: Ensuring Curves are never Empty}{1}{section*.3}
+\contentsline {paragraph}{}{1}{section*.4}
+\contentsline {paragraph}{}{1}{section*.5}
+\contentsline {paragraph}{}{2}{section*.6}
+\contentsline {section}{Implementation}{2}{section*.7}
+\contentsline {subsection}{Files}{2}{section*.8}
+\contentsline {subsection}{How to execute the Module}{2}{section*.9}
+\contentsline {subsection}{Testing the Module}{2}{section*.10}
+\contentsline {subsection}{Test Results}{3}{section*.11}
