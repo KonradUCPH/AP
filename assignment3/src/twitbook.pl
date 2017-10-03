@@ -1,3 +1,9 @@
+/*
+    Assignment 3: Prolog
+    Konrad Gnoinski, Steffen Czolbe
+*/
+
+
 /* gives acces to the atom of a Person.
     reads from a Graph g
     getPerson(G, Name, Friends) */
@@ -99,6 +105,8 @@ friendly(G, X) :-
 
 /* True if X doesnt like anyone who likes him*/
 hostile(G, X) :-
+    getNames(G, NamesG),
+    elem(X,NamesG),
     likedBy(G, X, PeopleWhoLikeX),
     dislikesEveryone(G, X, PeopleWhoLikeX).
 
@@ -106,6 +114,7 @@ hostile(G, X) :-
     likedBy(Graph, x, [list of people who like X])*/
 likedBy(G, X, Peolple) :-
     likedBy(G, G, X, Peolple).
+
 likedBy(G, [P|T], X, [Name|XS]) :-
     pCompound(P, Name, Friends),
     elem(X, Friends),
@@ -115,7 +124,6 @@ likedBy(G, [P|T], X, XS) :-
     notElem(G, X, Friends),
     likedBy(G, T, X, XS).
 likedBy(_, [], _, []).
-
 
 /* admires = transitive like*/
 admires(G, X, Y) :-
@@ -128,8 +136,9 @@ admires(G, X, Y) :-
         ** no guarantee for efficiency ;)** */
 admiresList(G, [X| _], Y, VS, [X, Y|VS]) :-
     likes(G, X, Y). % target found
-admiresList(_, [X| _], _, VS, VS) :-
-    elem(X, VS). % X was already visited
+admiresList(G, [X| T], Y, VS, VS1) :-
+    elem(X, VS), % X was already visited
+    admiresList(G, T, Y, VS, VS1).
 admiresList(_, [], _, VS, VS).
 admiresList(G, [X| XS], Y, VS, VS2) :-
     notLikes(G, X, Y), % target not found, continue serach and not X as visited
@@ -146,31 +155,16 @@ indifferent(G, X, Y) :-
     admiresList(G, [X], Y, [], VS),
     notElem(G, Y, VS). % did we ever visit Y if yes, X admires Y?
 
+/* checks if two Graphs G and H are the same word, just with different names.
+    A contains the name translation list*/
 same_world(G, H, A) :-
-    translateGraph(G, H, A),
-    translate(G, G, A, G1),
-    equalSP(G1, H).
+    getTranslationTable(G, H, A),
+    translateGraph(G, A, TG),
+    equalSP(TG, H).
 
-/* translate(Graph g, Graph G, translation table, Translates Graph)*/
-translate(_, [], _, []).
-translate(G, [person(Name, Friends) | GS], A, 
-  [person(TranslatedName, TranslatedFriends)|TNS]) :-
-    translateName(G, Name, A, TranslatedName),
-    translateNames(G, Friends, A, TranslatedFriends),
-    translate(G, GS, A, TNS).
 
-translateName(_, Name, [(Name, TranslatedName)| _], TranslatedName).
-translateName(G, Name, [(Name1, _)| AS], TranslatedName) :-
-    different(G, Name, Name1),
-    translateName(G, Name, AS, TranslatedName).
-
-translateNames(_, [], _, []).
-translateNames(G, [Name|NS], A, [TranslatedName|TNS]) :-
-    translateName(G, Name, A, TranslatedName),
-    translateNames(G, NS, A, TNS).
-
-/* Checks if two sets of persons are equal, ignoring order*/
-equalSP([],[]). %TODO: fix for persons and friend lists
+/* Checks if two sets of persons are equal, ignoring order of persons and friends*/
+equalSP([],[]).
 equalSP([X|XS], YS) :-
     selectP(X, YS, YS1),
     equalSP(XS, YS1).
@@ -182,7 +176,7 @@ selectP(P, [X|XS], XS) :-
 selectP(P, [X|XS], [X|YS]) :-
     selectP(P, XS, YS).
 
-/* Equal of the person Compound*/
+/* Equal of the person Compound, ignores order of friends*/
 equalP(person(Nx, F1), person(Nx, F2)) :-
     equalS(F1, F2).
 
@@ -192,32 +186,53 @@ equalS([X|XS], YS) :-
     mySelect(X, YS, YS1),
     equalS(XS, YS1).
 
-%sameWorld(G, H, A) :- 
-%.
-translateGraph(G, H, A) :- 
-    getTheList(G, NamesG), 
-    getTheList(H, NamesH),
+/* converts a graph G given the translation list A */
+translateGraph([], _, []).
+translateGraph([P|T], A, [P2|T2]) :-
+    convertPerson(P, A, P2),
+    translateGraph(T, A, T2).
+
+/* converts a person given the translation list A */
+convertPerson(person(Name, Friends), A, person(TName, TFriends)) :-
+    translateName(Name, A, TName),
+    translateFriends(Friends, A, TFriends).
+
+/* converts a list of names (Friendslist) given the translation list A */
+translateFriends([], _, []).
+translateFriends([Name|T], A, [TName|TT]) :-
+    translateName(Name, A, TName),
+    translateFriends(T, A, TT).
+
+/* converts a Name given the translation list A */
+translateName(Name, [(Name, TName)|_], TName).
+translateName(Name, [_|T], TName) :-
+    translateName(Name, T, TName).
+
+/* generates all possible translation tables A for the given graphs G and H*/
+getTranslationTable(G, H, A) :- 
+    getNames(G, NamesG), 
+    getNames(H, NamesH),
     combinationMaker(NamesG, NamesH, A).
 
-getTheList([], []).
-getTheList([person(Name,_)|T], [Name|NF]) :- getTheList(T, NF).
+/* Collects all Names of the persons in Graph G */
+getNames([], []).
+getNames([person(Name,_)|T], [Name|NF]) :- getNames(T, NF).
 
+/* creates all possible combinations of elements from the two lists G and H */
 combinationMaker(LA, LB, A) :-
-    permutation(LA, PLA), 
     permutation(LB, PLB),
-    zip(PLA, PLB, A).
+    zip(LA, PLB, A).
 
+/* generates all possible permutations of a given list */
 permutation([], []).
 permutation(List, [Element | Permutation]) :-
     mySelect(Element, List, Rest),
     permutation(Rest, Permutation).
 
+/* Zips two lists */
 zip([],[],[]).
 zip([LAH|LAT], [LBH|LBT], [(LAH,LBH)|R]) :-
     zip(LAT, LBT, R).
     
-
-
-
 
 
