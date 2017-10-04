@@ -1,12 +1,12 @@
 \select@language {english}
 \contentsline {section}{Description of the Assignment}{1}{section*.2}
-\contentsline {section}{Solution}{1}{section*.3}
-\contentsline {subsection}{Implementation}{1}{section*.4}
-\contentsline {subsection}{Source-code Organisation}{1}{section*.5}
+\contentsline {section}{Solution}{2}{section*.3}
+\contentsline {subsection}{Implementation}{2}{section*.4}
+\contentsline {subsection}{Source-code Organisation}{2}{section*.5}
 \contentsline {subsection}{Test Cases}{2}{section*.6}
 \contentsline {subsection}{How to Execute the Program}{2}{section*.7}
 \contentsline {section}{Implementation}{2}{section*.8}
 \contentsline {subsection}{Assumptions}{2}{section*.9}
-\contentsline {section}{Assessment}{2}{section*.10}
-\contentsline {subsection}{Correctness of Solution}{2}{section*.11}
-\contentsline {subsection}{Summary of Code Quality}{2}{section*.12}
+\contentsline {section}{Assessment}{3}{section*.10}
+\contentsline {subsection}{Correctness of Solution}{3}{section*.11}
+\contentsline {subsection}{Summary of Code Quality}{3}{section*.12}
