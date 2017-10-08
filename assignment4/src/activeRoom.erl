@@ -3,19 +3,19 @@
 %%% Oct 2017
 %%% This file contains the process for an active game room of the kaboose game
 
--module(aRoom).
+-module(activeRoom).
 
--import(basicserver, [request_reply/2, async/2]).
+-import(basicServer, [request_reply/2, async/2]).
 -export([start/1, init/0, next/1, handle/2]).
 
 
 % start the server
 start({Conductor, Questions}) -> 
-    State = #{questions => Questions, 
+    State = #{questions => Questions, % init State dict
                 cRef => Conductor, 
                 players => [], 
                 questionActive => false},
-    ARoomPid = basicserver:start(aRoom, State),
+    ARoomPid = basicServer:start(activeRoom, State),
     if 
         ARoomPid == [] ->
             {error, could_not_spawn_a_process};

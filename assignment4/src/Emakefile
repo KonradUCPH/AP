@@ -1,0 +1,10 @@
+% src directory
+{'./*', [debug_info,  
+           {i, "."},
+           {outdir, "./ebin"}]}.
+
+% src/test directory
+{'./test/*', [debug_info,
+           {i, "."},
+           {i, "./test"},
+           {outdir, "./ebin"}]}.

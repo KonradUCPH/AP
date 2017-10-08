@@ -2,15 +2,16 @@
 %%
 %% Author: Ken Friis Larsen <kflarsen@diku.dk>
 %% Modified by Per Steffen Czolbe
-%% Date: October, 2015
+%% Date: October, 2017
 
--module(basicserver).
--export([start/1, request_reply/2, async/2, start/2]).
+-module(basicServer).
+-export([start/1, start/2, request_reply/2, async/2]).
 
 % start the server. Calls init() function of given module. 
-% sthis function need to supply the initial state.
+% this module needs to supply the initial state.
 start(Mod) ->
     spawn(fun() -> loop(Mod, Mod:init()) end).
+% spawn for non static initial state
 start(Mod, InitialState) ->
     spawn(fun() -> loop(Mod, InitialState) end).
 

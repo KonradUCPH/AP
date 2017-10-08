@@ -5,14 +5,14 @@
 
 -module(room).
 
--import(basicserver, [request_reply/2, async/2]).
--import(aRoom, [start/1]).
+-import(basicServer, [request_reply/2, async/2]).
+-import(activeRoom, [start/1]).
 -export([start/0, init/0, add_question/2, handle/2,get_questions/1, play/1]).
 
 
 % start the server
 start() -> 
-    RoomPid = basicserver:start(room),
+    RoomPid = basicServer:start(room),
     if 
         RoomPid == [] ->
             {error, could_not_spawn_a_process};
@@ -31,7 +31,7 @@ get_questions({room, RoomPid}) ->
     request_reply(RoomPid, {getQuestions}).
 
 play({room, RoomPid}) ->
-    request_reply(RoomPid, {activateARoom, self()}).
+    request_reply(RoomPid, {activateRoom, self()}).
 
 
 %% internal implementation
@@ -43,6 +43,6 @@ handle({addQuestion, Question}, State) ->
     {ok, State1};
 handle({getQuestions}, State) ->
     {State, State};
-handle({activateARoom, Conductor}, State) ->
-    Reply = aRoom:start({Conductor, State}),
+handle({activateRoom, Conductor}, State) ->
+    Reply = activeRoom:start({Conductor, State}),
     {Reply, State}.
