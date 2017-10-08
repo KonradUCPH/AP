@@ -2,3 +2,4 @@
 *.stack-work
 *.DS_Store
 *.zip
+*.beam

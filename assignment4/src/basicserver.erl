@@ -1,6 +1,7 @@
 %% Simple generic server library
 %%
 %% Author: Ken Friis Larsen <kflarsen@diku.dk>
+%% Modified by Per Steffen Czolbe
 %% Date: October, 2015
 
 -module(basicserver).

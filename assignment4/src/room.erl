@@ -1,3 +1,8 @@
+%%% AP assignment 4 
+%%% Per Stefen Czolbe, Konrad Gnoinski
+%%% Oct 2017
+%%% This file contains the process for a room blueprint of the kaboose game
+
 -module(room).
 
 -import(basicserver, [request_reply/2, async/2]).
@@ -5,14 +10,17 @@
 -export([start/0, init/0, add_question/2, handle/2,get_questions/1, play/1]).
 
 
+% start the server
 start() -> 
     RoomPid = basicserver:start(room),
     if 
         RoomPid == [] ->
-            {error, "Could not spawn a process!"};
+            {error, could_not_spawn_a_process};
         true ->
             {ok, {room, RoomPid}}
     end.
+
+%% client API functions
 
 % Question structure should be {Description, [{correct,Text}, Text]}
 add_question({room, RoomPid}, Question) -> 
@@ -25,6 +33,8 @@ get_questions({room, RoomPid}) ->
 play({room, RoomPid}) ->
     request_reply(RoomPid, {activateARoom, self()}).
 
+
+%% internal implementation
 
 init() ->  [].
 
