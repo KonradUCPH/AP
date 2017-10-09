@@ -40,8 +40,8 @@ get_questions(Room) -> room:get_questions(Room).
 play(Room) -> room:play(Room).
 next(ActiveRoom) -> activeRoom:next(ActiveRoom).
 timesup(_ActiveRoom) -> undefined.
-join(_ActiveRoom, _Nickname) -> undefined.
-leave(_ActiveRoom, _Ref) -> undefined.
+join(ActiveRoom, Nickname) -> activeRoom:join(ActiveRoom, Nickname).
+leave(ActiveRoom, Ref) -> activeRoom:leave(ActiveRoom, Ref).
 rejoin(_ActiveRoom, _Ref) -> undefined.
 guess(_ActiveRoom, _Ref, _Index) -> undefined.
 

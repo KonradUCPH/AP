@@ -22,7 +22,8 @@ request_reply(Pid, Request) ->
     end.
 
 async(Pid, Message) -> 
-    Pid ! {async, Message}.
+    Pid ! {async, Message},
+    ok.
 
 loop(Mod, State) ->
     receive

@@ -24,8 +24,7 @@ start() ->
 
 % Question structure should be {Description, [{correct,Text}, Text]}
 add_question({room, RoomPid}, Question) -> 
-    async(RoomPid ,{addQuestion, Question}),
-    ok.
+    async(RoomPid ,{addQuestion, Question}).
 
 get_questions({room, RoomPid}) -> 
     request_reply(RoomPid, {getQuestions}).
