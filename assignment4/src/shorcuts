@@ -10,8 +10,9 @@ kaboose:add_question(R, {"What Is your name?", [{correct, "Konrad"}, "Steffan"]}
 {ok, Ref1} = kaboose:join(Aroom, "konrad").
 {ok, Ref2} = kaboose:join(Aroom, "Test").
 kaboose:leave(Aroom, Ref2).
+kaboose:rejoin(Aroom, Ref2).
 
 
 
 
-receive M -> M after 500 -> timeout end.
+receive M -> M; N -> N; O -> O after 0 -> timeout end.

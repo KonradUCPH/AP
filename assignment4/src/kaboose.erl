@@ -42,7 +42,7 @@ next(ActiveRoom) -> activeRoom:next(ActiveRoom).
 timesup(_ActiveRoom) -> undefined.
 join(ActiveRoom, Nickname) -> activeRoom:join(ActiveRoom, Nickname).
 leave(ActiveRoom, Ref) -> activeRoom:leave(ActiveRoom, Ref).
-rejoin(_ActiveRoom, _Ref) -> undefined.
+rejoin(ActiveRoom, Ref) -> activeRoom:rejoin(ActiveRoom, Ref).
 guess(_ActiveRoom, _Ref, _Index) -> undefined.
 
 %% internal implementation

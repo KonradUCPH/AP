@@ -6,7 +6,7 @@
 -module(activeRoom).
 
 -import(basicServer, [request_reply/2, async/2]).
--export([start/1, init/0, next/1, handle/2, join/2, leave/2]).
+-export([start/1, init/0, next/1, handle/2, join/2, leave/2, rejoin/2, debug/1]).
 
 
 % start the server
@@ -34,6 +34,12 @@ join({activeRoom, AroomPid}, Nickname) ->
 leave({activeRoom, AroomPid}, Ref) -> 
     async(AroomPid, {leave, Ref}).
 
+rejoin({activeRoom, AroomPid}, Ref) -> 
+    async(AroomPid, {rejoin, Ref}).
+
+debug({activeRoom, AroomPid}) ->
+    request_reply(AroomPid, {debug}).
+
 %% internal implementation
 
 init() -> #{}.
@@ -56,6 +62,7 @@ handle({nextQuestion, Caller}, State) ->
             [Question1|_] = Questions,
             {{ok, Question1}, State1}
     end;
+
 handle({join, Nickname}, State) ->
     Players = maps:get(players, State),
     Reference = {playerRef, Nickname},
@@ -69,6 +76,7 @@ handle({join, Nickname}, State) ->
             messageConductor(State1, player_has_joined),
             {{ok, Reference}, State1}
     end;
+
 handle({leave, Ref}, State) ->
     Players = maps:get(players, State),
     Player = maps:get(Ref, Players),
@@ -77,7 +85,20 @@ handle({leave, Ref}, State) ->
     Players1 = Players#{Ref := Player1},
     State1 = State#{players := Players1},
     messageConductor(State1, player_has_left),
-    {ok, State1}.
+    {ok, State1};
+
+handle({rejoin, Ref}, State) ->
+    Players = maps:get(players, State),
+    Player = maps:get(Ref, Players),
+    {Nickname, Points, _} = Player,
+    Player1 = {Nickname, Points, active},
+    Players1 = Players#{Ref := Player1},
+    State1 = State#{players := Players1},
+    messageConductor(State1, player_has_rejoined),
+    {ok, State1};
+
+handle({debug}, State) ->
+    {State, State}.
 
 
 
