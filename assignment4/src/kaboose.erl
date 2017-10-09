@@ -39,7 +39,7 @@ add_question(Room, Question) -> room:add_question(Room, Question).
 get_questions(Room) -> room:get_questions(Room).
 play(Room) -> room:play(Room).
 next(ActiveRoom) -> activeRoom:next(ActiveRoom).
-timesup(_ActiveRoom) -> undefined.
+timesup(ActiveRoom) -> activeRoom:timesup(ActiveRoom).
 join(ActiveRoom, Nickname) -> activeRoom:join(ActiveRoom, Nickname).
 leave(ActiveRoom, Ref) -> activeRoom:leave(ActiveRoom, Ref).
 rejoin(ActiveRoom, Ref) -> activeRoom:rejoin(ActiveRoom, Ref).
