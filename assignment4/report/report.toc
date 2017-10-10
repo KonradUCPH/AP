@@ -14,4 +14,4 @@
 \contentsline {section}{Assessment}{5}{section*.14}
 \contentsline {subsection}{Scope of Test Cases}{5}{section*.15}
 \contentsline {subsection}{Correctness of Solution}{5}{section*.16}
-\contentsline {subsection}{Summary of Code Quality}{5}{section*.17}
+\contentsline {subsection}{Summary of Code Quality}{6}{section*.17}
