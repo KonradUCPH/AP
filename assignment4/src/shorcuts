@@ -12,6 +12,8 @@ kaboose:add_question(R, {"What Is your name?", [{correct, "Konrad"}, "Steffan"]}
 kaboose:leave(Aroom, Ref2).
 kaboose:rejoin(Aroom, Ref2).
 
+kaboose:timesup(Aroom).
+
 
 
 
