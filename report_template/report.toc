@@ -1,0 +1,16 @@
+\select@language {english}
+\contentsline {section}{Description of the Assignment}{1}{section*.2}
+\contentsline {section}{Solution}{1}{section*.3}
+\contentsline {subsection}{Tools}{1}{section*.4}
+\contentsline {subsection}{Files}{1}{section*.5}
+\contentsline {subsection}{Test Cases}{2}{section*.6}
+\contentsline {subsection}{Program Execution}{2}{section*.7}
+\contentsline {section}{Implementation}{3}{section*.8}
+\contentsline {subsection}{Assumptions}{3}{section*.9}
+\contentsline {subsection}{Structure}{3}{section*.10}
+\contentsline {subsection}{Hard Task 1}{3}{section*.11}
+\contentsline {subsection}{Hard Task 2}{3}{section*.12}
+\contentsline {section}{Assessment}{4}{section*.13}
+\contentsline {subsection}{Scope of Test Cases}{4}{section*.14}
+\contentsline {subsection}{Correctness of Solution}{4}{section*.15}
+\contentsline {subsection}{Summary of Code Quality}{4}{section*.16}

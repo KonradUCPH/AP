@@ -1,0 +1,130 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[english, science, small]{ku-frontpage}
+\usepackage[utf8]{inputenc}
+\usepackage[cache=false]{minted}
+
+\usepackage{listings}
+\lstdefinestyle{Bash}
+{language=bash,
+	keywordstyle=\color{blue},
+	basicstyle=\ttfamily,
+	morekeywords={peter@kbpet},
+	alsoletter={:~\$},
+	morekeywords=[2]{peter@kbpet:},
+	keywordstyle=[2]{\color{red}},
+	literate={\$}{{\textcolor{red}{\$}}}1 
+	{:}{{\textcolor{red}{:}}}1
+	{~}{{\textcolor{red}{\textasciitilde}}}1,
+}
+
+\setlength\arraycolsep{2 pt}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{0}
+
+\author{Per Steffen Czolbe, Konrad Gnoinski}
+\title{Advanced Programming}
+\subtitle{Assignment 3: Analyzing TwitBook} % No subtitle
+\date{Handed in: \today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+
+\section{Description of the Assignment}
+
+\section{Solution}
+This section gives a brief overview about the structure of the solution and how to execute the code.
+
+\subsection{Tools}
+what language was used? What frameworks, libarier were used? what restrictions?
+
+\subsection{Files}
+The code is organised in just two files:
+\begin{itemize}
+	\item \texttt{src/twitbook.pl}: the file containing all the required predicates as well as definition of twitbook structures. 
+	\item \texttt{src/tests.pl}: the file containing static tests of the predicates functionality.
+\end{itemize}
+
+\subsection{Test Cases}
+The \texttt{src/test.pl} file contains multiple tests. The test framework used is \texttt{PL-Unit}. In order to validate the tests :
+\begin{lstlisting}[style=Bash]
+$ [twitbook], [tests].
+$ run_tests.
+\end{lstlisting}
+
+\subsection{Program Execution}
+The predicates can be imported from the \texttt{src/twitbook.pl} file. Our predicates were made with use of SWIProlog. Calling predicates is performed by e.g. :
+\begin{lstlisting}[style=Bash]
+$ [test], [twitbook].
+$ g1(G), likes(G, kara, oliver).
+\end{lstlisting}
+
+\pagebreak
+\section{Implementation}
+A description of the implementation.
+
+\subsection{Assumptions}
+
+\subsection{Structure}
+Discuss overall structure of the solution
+
+\subsection{Hard Task 1}
+Explain how you solved a hard task. Maybe include some code:
+
+\begin{minted}{python}
+import numpy as np
+
+def incmatrix(genl1,genl2):
+m = len(genl1)
+n = len(genl2)
+M = None #to become the incidence matrix
+VT = np.zeros((n*m,1), int)  #dummy variable
+
+#compute the bitwise xor matrix
+M1 = bitxormatrix(genl1)
+M2 = np.triu(bitxormatrix(genl2),1)
+
+for i in range(m-1):
+for j in range(i+1, m):
+[r,c] = np.where(M2 == M1[i,j])
+for k in range(len(r)):
+VT[(i)*n + r[k]] = 1;
+VT[(i)*n + c[k]] = 1;
+VT[(j)*n + r[k]] = 1;
+VT[(j)*n + c[k]] = 1;
+
+if M is None:
+M = np.copy(VT)
+else:
+M = np.concatenate((M, VT), 1)
+
+VT = np.zeros((n*m,1), int)
+
+return M
+\end{minted}
+
+\subsection{Hard Task 2}
+
+
+\pagebreak
+\section{Assessment}
+This section contains the assessment of the presented solution.
+
+
+\subsection{Scope of Test Cases}
+What is covered by the tests? Just positive cases tested or also negative?
+
+\subsection{Correctness of Solution}
+Based on the extensive tests, analyzing the code we assume the solution is likely to be correct.
+\\
+Additionally, the solutions passed the Online TA test.
+
+\subsection{Summary of Code Quality}
+Based on the extensive tests, we do believe that the functionality of this set of predicates matches the functionality specified in the assignment. 
+
+The quality of the code could be improved by using more functions from the Prolog standard library, especially using some of the restricted operators.  However, that is our first experience in the new language, so we find it beneficial to be restricted from use of build in predicates. That we need to fully understand basics of a language, without being artificially pushed further by the use of complex predicates that are a closed box for us.  Predicate \texttt{different\_world} was not implemented.
+
+
+\end{document}
