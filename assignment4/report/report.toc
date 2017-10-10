@@ -1,0 +1,17 @@
+\select@language {english}
+\contentsline {section}{Description of the Assignment}{1}{section*.2}
+\contentsline {section}{Solution}{2}{section*.3}
+\contentsline {subsection}{Tools}{2}{section*.4}
+\contentsline {subsection}{Files}{2}{section*.5}
+\contentsline {subsection}{Program Execution}{2}{section*.6}
+\contentsline {subsection}{Running Tests}{2}{section*.7}
+\contentsline {section}{Implementation}{3}{section*.8}
+\contentsline {subsection}{Assumptions}{3}{section*.9}
+\contentsline {subsection}{Keeping Things Organized}{3}{section*.10}
+\contentsline {subsection}{Processes and Communication}{3}{section*.11}
+\contentsline {subsection}{Guessing While no Question is Active}{3}{section*.12}
+\contentsline {subsection}{Suggested Improvements to the Kaboose API}{4}{section*.13}
+\contentsline {section}{Assessment}{5}{section*.14}
+\contentsline {subsection}{Scope of Test Cases}{5}{section*.15}
+\contentsline {subsection}{Correctness of Solution}{5}{section*.16}
+\contentsline {subsection}{Summary of Code Quality}{5}{section*.17}

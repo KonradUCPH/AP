@@ -1,0 +1,16 @@
+\BOOKMARK [1][-]{section*.2}{Description of the Assignment}{}% 1
+\BOOKMARK [1][-]{section*.3}{Solution}{}% 2
+\BOOKMARK [2][-]{section*.4}{Tools}{section*.3}% 3
+\BOOKMARK [2][-]{section*.5}{Files}{section*.3}% 4
+\BOOKMARK [2][-]{section*.6}{Program Execution}{section*.3}% 5
+\BOOKMARK [2][-]{section*.7}{Running Tests}{section*.3}% 6
+\BOOKMARK [1][-]{section*.8}{Implementation}{}% 7
+\BOOKMARK [2][-]{section*.9}{Assumptions}{section*.8}% 8
+\BOOKMARK [2][-]{section*.10}{Keeping Things Organized}{section*.8}% 9
+\BOOKMARK [2][-]{section*.11}{Processes and Communication}{section*.8}% 10
+\BOOKMARK [2][-]{section*.12}{Guessing While no Question is Active}{section*.8}% 11
+\BOOKMARK [2][-]{section*.13}{Suggested Improvements to the Kaboose API}{section*.8}% 12
+\BOOKMARK [1][-]{section*.14}{Assessment}{}% 13
+\BOOKMARK [2][-]{section*.15}{Scope of Test Cases}{section*.14}% 14
+\BOOKMARK [2][-]{section*.16}{Correctness of Solution}{section*.14}% 15
+\BOOKMARK [2][-]{section*.17}{Summary of Code Quality}{section*.14}% 16
