@@ -6,6 +6,7 @@
 
 -module(kaboose).
 -import(basicServer, [start/1, request_reply/2]).
+-include_lib("eunit/include/eunit.hrl").
 -export([start/0, 
          init/0, 
          handle/2,
@@ -43,7 +44,7 @@ timesup(ActiveRoom) -> activeRoom:timesup(ActiveRoom).
 join(ActiveRoom, Nickname) -> activeRoom:join(ActiveRoom, Nickname).
 leave(ActiveRoom, Ref) -> activeRoom:leave(ActiveRoom, Ref).
 rejoin(ActiveRoom, Ref) -> activeRoom:rejoin(ActiveRoom, Ref).
-guess(_ActiveRoom, _Ref, _Index) -> undefined.
+guess(ActiveRoom, Ref, Index) -> activeRoom:guess(ActiveRoom, Ref, Index).
 
 %% internal implementation
 
