@@ -6,7 +6,7 @@
 -module(activeRoom).
 
 -import(basicServer, [request_reply/2, async/2]).
--export([start/1, init/0, next/1, handle/2, join/2, leave/2, rejoin/2, timesup/1, debug/1]).
+-export([start/1, init/0, next/1, handle/2, join/2, leave/2, rejoin/2, timesup/1, debug/1, guess/3, updatepoints/1, distributionListAdd/2]).
 
 
 % start the server
@@ -15,8 +15,8 @@ start({Conductor, Questions}) ->
                 cRef => Conductor, 
                 players => #{}, 
                 questionActive => false,
-                activeQ_amountOfOptions => 0,
-                activeQ_distribOfOptions => #{},
+                currentPoints => 0,
+                activeQ_distribOfOptions => [],
                 activeQ_points => #{}
              },
     ARoomPid = basicServer:start(activeRoom, State),
@@ -44,8 +44,14 @@ rejoin({activeRoom, AroomPid}, Ref) ->
 timesup({activeRoom, AroomPid}) ->
     request_reply(AroomPid, {timesUp, self()}).
 
+guess({activeRoom, AroomPid}, Ref, Index) -> 
+    async(AroomPid, {guess, Ref, Index}).
+
 debug({activeRoom, AroomPid}) ->
     request_reply(AroomPid, {debug}).
+
+updatepoints(AroomPid) ->
+    async(AroomPid, {updatePoints}).
 
 %% internal implementation
 
@@ -53,7 +59,7 @@ init() -> #{}.
 
 messageConductor(State, Message) ->
     CRef = maps:get(cRef, State),
-    async(CRef, Message).
+    CRef ! {CRef, Message}.
 
 % initialises the list of distributions
 distributionListInit(OptionsCnt) ->
@@ -63,12 +69,9 @@ distributionListInit(OptionsCnt) ->
     end.
 % adds an answer to the distribution list
 % Answer index is 1-indexed!
-distributionListAdd(DistList, AnswerIdx) ->
-    [H| T] = DistList,
-    if
-        AnswerIdx == 1 -> [H + 1 | T];
-        true -> [H| distributionListAdd(T, AnswerIdx-1)]
-    end.
+distributionListAdd([], _) -> [];
+distributionListAdd([H|T], 1) -> [H + 1 | T];
+distributionListAdd([H|T], Index) -> [H| distributionListAdd(T, Index - 1)].
 
 
 
@@ -79,10 +82,11 @@ initQuestion(State) ->
     {_, Options} = Question,
     OptionsCnt = length(Options),
     OptionsDist = distributionListInit(OptionsCnt),
-    State#{questionActive := true, 
-           activeQ_amountOfOptions := OptionsCnt,
-           activeQ_distribOfOptions => OptionsDist,
-           activeQ_points => #{}
+    timer:apply_after(500, activeRoom, updatepoints,[self()]),
+    State#{ questionActive := true, 
+            currentPoints := 1000,
+            activeQ_distribOfOptions := OptionsDist,
+            activeQ_points := #{}
             }.
 
 % adds points of the current question to the player dictionary
@@ -91,9 +95,9 @@ addPoints([], PlayerDict) -> PlayerDict;
 addPoints(CurrentQuestionPointsList, PlayerDict) ->
     [{Nick, NewPoints} | Tail] = CurrentQuestionPointsList,
     PlayerDict1 = addPoints(Tail, PlayerDict),
-    Reference = {ref, Nick},
+    Reference = {playerRef, Nick},
     {_, OldPoints, ActiveState} = maps:get(Reference, PlayerDict1), 
-    PlayerDict1#{{ref, Nick} => {Nick, OldPoints + NewPoints, ActiveState}}.
+    PlayerDict1#{{playerRef, Nick} => {Nick, OldPoints + NewPoints, ActiveState}}.
 
 % transforms the player dict into the format required for total
 % player dict format: #{Ref => {Nick, Points, ActiveState}}
@@ -156,11 +160,13 @@ handle({join, Nickname}, State) ->
     NickExists = maps:is_key(Reference, Players),
     if 
         NickExists ->
-            {{error, is_taken}, State};
+            {{error, Nickname, is_taken}, State};
         true -> 
             Players1 = Players#{Reference => {Nickname, 0, active}},
             State1 = State#{players := Players1},
-            messageConductor(State1, player_has_joined),
+            PlayersList = maps:values(Players1),
+            NoOfPlayers = activePlayers(PlayersList),
+            messageConductor(State1, {player_joined, Nickname, NoOfPlayers}),
             {{ok, Reference}, State1}
     end;
 
@@ -171,7 +177,9 @@ handle({leave, Ref}, State) ->
     Player1 = {Nickname, Points, inactive},
     Players1 = Players#{Ref := Player1},
     State1 = State#{players := Players1},
-    messageConductor(State1, player_has_left),
+    PlayersList = maps:values(Players1),
+    NoOfPlayers = activePlayers(PlayersList),
+    messageConductor(State1, {player_left, Nickname, NoOfPlayers}),
     {ok, State1};
 
 handle({rejoin, Ref}, State) ->
@@ -181,7 +189,9 @@ handle({rejoin, Ref}, State) ->
     Player1 = {Nickname, Points, active},
     Players1 = Players#{Ref := Player1},
     State1 = State#{players := Players1},
-    messageConductor(State1, player_has_rejoined),
+    PlayersList = maps:values(Players1),
+    NoOfPlayers = activePlayers(PlayersList),
+    messageConductor(State1, {player_joined, Nickname, NoOfPlayers}),
     {ok, State1};
 
 handle({timesUp, Caller}, State) ->
@@ -195,12 +205,73 @@ handle({timesUp, Caller}, State) ->
         true ->
             endQuestion(State)
     end;
-        %true ->
-            % set question to inactive
+
+handle({guess, Ref, Index}, State) ->
+    Questions = maps:get(questions, State),
+    [Question|_] = Questions,
+    {_, Options} = Question, 
+    NoOfOptions = length(Options),
+    % Check if index is not higher than number of possible answers
+    if
+        (Index > NoOfOptions) or (Index < 1) ->
+            {error, State};
+        true -> 
+            [Question|_] = Questions,
+            {_, Options} = Question,
+            Players = maps:get(players, State),
+            Player = maps:get(Ref, Players),
+            {Nickname, _, _} = Player,
+            Apoints = maps:get(activeQ_points, State),
+            Iscorrect = isCorrect(Options, Index),
+            CurrentPoints = maps:get(currentPoints, State),
+            Distribution = maps:get(activeQ_distribOfOptions, State),
+            % Getting a points for a current player
+            IsAlreadyAnswered = maps:is_key(Nickname, Apoints),
+            IsActive = maps:get(questionActive, State),
+            if 
+                not IsActive ->
+                    {error, State};
+                IsAlreadyAnswered -> 
+                    {error, State};
+                Iscorrect -> 
+            % Adding points for the user
+                    Apoints1 = Apoints#{Nickname => CurrentPoints},
+             % keeping the record for a distribution of answers
+                    Distribution1 = distributionListAdd(Distribution, Index),
+                    State1 = State#{activeQ_points := Apoints1, 
+                                    activeQ_distribOfOptions := Distribution1},
+                    {ok, State1};
+                not Iscorrect ->
+            % Adding 0 points for a user to mark users that have already answered
+                    Apoints1 = Apoints#{Nickname => 0},
+                    Distribution1 = distributionListAdd(Distribution, Index),
+                    State1 = State#{activeQ_points := Apoints1, 
+                                    activeQ_distribOfOptions := Distribution1},
+                    {ok, State1}
+            end
+        end;
+
+handle({updatePoints}, State) ->
+    State1 = State#{currentPoints := 500},
+    {ok, State1};
 
 
 handle({debug}, State) ->
     {State, State}.
 
+isCorrect(Options, Index) ->
+    case lists:nth(Index, Options) of
+        {correct, _} ->
+            true;
+        _ ->
+            false
+    end.
+
+activePlayers([]) -> 0;
+activePlayers([H|T]) -> 
+    case H of
+        {_, _, active}   -> 1 + activePlayers(T);
+        {_, _, inactive} -> activePlayers(T)
+    end.
 
 

@@ -4,15 +4,18 @@ f().
 {ok,S} = kaboose:start().
 {ok,R} = kaboose:get_a_room(S).
 kaboose:add_question(R, {"What Is your age?", [{correct, "24"}, "25"]}).
-kaboose:add_question(R, {"What Is your name?", [{correct, "Konrad"}, "Steffan"]}).
+kaboose:add_question(R, {"What Is your name?", ["option1", {correct, "Konrad"}, "Steffan"]}).
 {Aroom, CRef} = kaboose:play(R).
 {ok, Q} = kaboose:next(Aroom).
 {ok, Ref1} = kaboose:join(Aroom, "konrad").
 {ok, Ref2} = kaboose:join(Aroom, "Test").
 kaboose:leave(Aroom, Ref2).
 kaboose:rejoin(Aroom, Ref2).
+kaboose:guess(Aroom, Ref2, 1). 
+
+kaboose:timesup(Aroom).
 
 
+activeRoom:debug(Aroom).
 
-
-receive M -> M; N -> N; O -> O after 0 -> timeout end.
+receive M -> M after 500 -> timeout end.

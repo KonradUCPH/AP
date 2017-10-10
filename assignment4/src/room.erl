@@ -24,7 +24,7 @@ start() ->
 
 % Question structure should be {Description, [{correct,Text}, Text]}
 add_question({room, RoomPid}, Question) -> 
-    async(RoomPid ,{addQuestion, Question}).
+    request_reply(RoomPid ,{addQuestion, Question}).
 
 get_questions({room, RoomPid}) -> 
     request_reply(RoomPid, {getQuestions}).
@@ -38,8 +38,14 @@ play({room, RoomPid}) ->
 init() ->  [].
 
 handle({addQuestion, Question}, State) ->
-    State1 = State ++ [Question],
-    {ok, State1};
+    {_, Options} = Question,
+    if 
+        Options /= [] ->  
+            State1 = State ++ [Question],
+            {ok, State1};
+        true -> 
+            {{error, no_options_given}, State}
+    end;
 handle({getQuestions}, State) ->
     {State, State};
 handle({activateRoom, Conductor}, State) ->
