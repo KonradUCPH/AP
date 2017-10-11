@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="By Ken Friis Larsen (kflarsen@diku.dk)">
+  <title>The Flamingo Route</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link href="data:text/css; charset=utf-8,%40font%2Dface%20%7B%0A%20%20font%2Dfamily%3A%20%27Dancing%20Script%27%3B%0A%20%20font%2Dstyle%3A%20normal%3B%0A%20%20font%2Dweight%3A%20400%3B%0A%20%20src%3A%20local%28%27Dancing%20Script%20Regular%27%29%2C%20local%28%27DancingScript%2DRegular%27%29%2C%20url%28https%3A%2F%2Ffonts%2Egstatic%2Ecom%2Fs%2Fdancingscript%2Fv8%2FDK0eTGXiZjN6yA8zAEyM2S5FJMZltoAAwO2fP7iHu2o%2Ettf%29%20format%28%27truetype%27%29%3B%0A%7D%0A%40font%2Dface%20%7B%0A%20%20font%2Dfamily%3A%20%27Oswald%27%3B%0A%20%20font%2Dstyle%3A%20normal%3B%0A%20%20font%2Dweight%3A%20400%3B%0A%20%20src%3A%20local%28%27Oswald%20Regular%27%29%2C%20local%28%27Oswald%2DRegular%27%29%2C%20url%28https%3A%2F%2Ffonts%2Egstatic%2Ecom%2Fs%2Foswald%2Fv14%2FY%5FTKV6o8WovbUd3m%5FX9aAA%2Ettf%29%20format%28%27truetype%27%29%3B%0A%7D%0A%40font%2Dface%20%7B%0A%20%20font%2Dfamily%3A%20%27Source%20Code%20Pro%27%3B%0A%20%20font%2Dstyle%3A%20normal%3B%0A%20%20font%2Dweight%3A%20400%3B%0A%20%20src%3A%20local%28%27Source%20Code%20Pro%27%29%2C%20local%28%27SourceCodePro%2DRegular%27%29%2C%20url%28https%3A%2F%2Ffonts%2Egstatic%2Ecom%2Fs%2Fsourcecodepro%2Fv6%2Fmrl8jkM18OlOQN8JLgasD9zbP97U9sKh0jjxbPbfOKg%2Ettf%29%20format%28%27truetype%27%29%3B%0A%7D%0A%40font%2Dface%20%7B%0A%20%20font%2Dfamily%3A%20%27Source%20Serif%20Pro%27%3B%0A%20%20font%2Dstyle%3A%20normal%3B%0A%20%20font%2Dweight%3A%20400%3B%0A%20%20src%3A%20local%28%27Source%20Serif%20Pro%27%29%2C%20local%28%27SourceSerifPro%2DRegular%27%29%2C%20url%28https%3A%2F%2Ffonts%2Egstatic%2Ecom%2Fs%2Fsourceserifpro%2Fv4%2FCeUM4np2c42DV49nanp55aqQQDHDiKO%2DLH8MFmRo0b0%2Ettf%29%20format%28%27truetype%27%29%3B%0A%7D%0A" rel="stylesheet">
+  <link href="data:text/css;charset=utf-8,body%20%7B%0Amargin%2Dtop%3A%201%2E0em%3B%0Abackground%2Dcolor%3A%20white%3B%0A%20font%2Dsize%3A%2013pt%3B%0Acolor%3A%20black%3B%0Awidth%3A%2090%25%3B%0Amargin%3A%200%20auto%3B%0A%7D%0Ahtml%20%7B%0Afont%2Dfamily%3A%20%22Source%20Serif%20Pro%22%2C%20Georgia%2C%20%22Times%20New%20Roman%22%2C%20serif%3B%0A%7D%0Ah2%2C%20h3%2C%20h4%2C%20h5%2C%20h6%20%7B%0Afont%2Dfamily%3A%20%22Oswald%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dweight%3A%20400%3B%0Acolor%3A%20%23313131%3B%0Aletter%2Dspacing%3A%20%2D%2E025rem%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20%22Source%20Code%20Pro%22%2C%20Menlo%2C%20monospace%3B%0A%20background%2Dcolor%3A%20%23F0F3F3%3B%0A%7D%0Apre%20%7B%0Abackground%2Dcolor%3A%20%23F0F3F3%3B%0Apadding%3A%206px%3B%0Aword%2Dwrap%3A%20break%2Dword%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%0Afont%2Dfamily%3A%20%22Source%20Code%20Pro%22%2C%20Menlo%2C%20monospace%3B%0Aborder%3A%201px%20solid%20silver%3B%0A%7D%0Ah1%2Etitle%20%7B%0Afont%2Dfamily%3A%20%27Dancing%20Script%27%2C%20sans%2Dserif%3B%0Atext%2Dalign%3A%20center%3B%20font%2Dsize%3A%203%2E8em%3B%20color%3A%20black%3B%20margin%2Dbottom%3A%203px%3B%0A%7D%0Ah1%20%2Esmall%20%7B%20font%2Dsize%3A%200%2E4em%3B%20%7D%0Ah1%20a%20%7B%20text%2Ddecoration%3A%20none%20%7D%0Ah2%20%7B%20font%2Dsize%3A%201%2E5em%3B%20color%3A%20black%3B%20%7D%0Ap%2Eauthor%20%7B%20font%2Dsize%3A%201em%3B%20text%2Dalign%3A%20center%3B%20color%3A%20black%3B%20%7D%0Ap%2Edate%20%7B%20font%2Dsize%3A%201em%3B%20text%2Dalign%3A%20center%3B%20color%3A%20black%3B%20%7D%0Aa%20%7B%20color%3A%20black%3B%20%7D%0A%2Edescription%20%7B%20font%2Dsize%3A%201%2E2em%3B%20margin%2Dbottom%3A%2030px%3B%20margin%2Dtop%3A%2030px%3B%20font%2Dstyle%3A%20italic%3B%7D%0A%2Edownload%20%7B%20float%3A%20right%3B%20%7D%0A%0Ahr%20%7B%20border%3A%200%3B%20width%3A%2080%25%3B%20border%2Dbottom%3A%201px%20solid%20%23aaa%7D%0A%2Efooter%20%7B%20text%2Dalign%3Acenter%3B%20padding%2Dtop%3A30px%3B%20font%2Dstyle%3A%20italic%3B%20%7D%0Atable%20%7B%20border%2Dcollapse%3A%20collapse%20%7D%0Atd%20%7B%20border%3A%201px%20solid%20black%20%7D%0A" rel="stylesheet">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header>
+<h1 class="title">The Flamingo Route</h1>
+<p class="author">By Ken Friis Larsen <code>(kflarsen@diku.dk)</code></p>
+<p class="date">Last revision: October 9, 2017</p>
+</header>
+<nav id="TOC">
+<ul>
+<li><a href="#part-1-the-flamingo-module">Part 1: The Flamingo module</a></li>
+<li><a href="#part-2-using-flamingo">Part 2: Using Flamingo</a></li>
+<li><a href="#example-use-of-flamingo">Example use of Flamingo</a></li>
+<li><a href="#hand-in-instructions">Hand-in Instructions</a></li>
+</ul>
+</nav>
+<p>This assignment is about making Flamingo, a central part of an up-and-coming web-framework. Flamingo is a so-called <em>routing library</em> that takes care of routing an HTTP request to a registered action module for a given path. The task of parsing an HTTP request is <em>not</em> part of this assignment.</p>
+<p>Terminology:</p>
+<ul>
+<li><p>An HTTP request consists of a <em>path</em> and perhaps some <em>arguments</em>. In Flamingo we represent paths as strings (checking that paths are well formed are outside the scope of the Flamingo library), and HTTP request arguments as a list of pairs of strings.</p>
+<p>That is, a <em>request</em> is a pair consisting of a path and a list of pairs. For instance, an HTTP request to <code>&quot;/add?x=5&amp;y=37&quot;</code> is represented as <code>{&quot;/add&quot;, [{&quot;x&quot;,&quot;5&quot;}, {&quot;y&quot;,&quot;37&quot;}]}</code>. We call the first component in an argument pair, the <em>key</em> and the second component the <em>value</em>. For instance, the keys in the example are <code>x</code> and <code>y</code>.</p></li>
+<li><p>A Flamingo server has some global immutable state shared amongst all routes. This global state is called the <em>environment</em>.</p></li>
+<li><p>Routes are grouped into <em>routing groups</em>.</p></li>
+<li><p>A <em>route</em> is a prefix of paths that it accepts, and it has an action module and some route-specific state associated. We call the route-specific state the <em>local state</em>.</p>
+<p>Routes in the same routing group share local state.</p>
+<p>There may be several routes with overlapping prefixes. For instance, both the prefix <code>&quot;/ad&quot;</code> and the prefix <code>&quot;/add&quot;</code> matches the path <code>&quot;/add&quot;</code>. When there are overlapping matches we choose the one with the longest prefix.</p></li>
+<li><p>A <em>response</em> to an HTTP request is a <em>status code</em> integer and some content string (typically an HTML page). That is, a response is a pair of an integer and a string.</p>
+<p>In this assignment we are only concerned with the following status codes:</p>
+<ul>
+<li><p><code>200</code> means success,</p></li>
+<li><p><code>404</code> for when there are no matching routes,</p></li>
+<li><p><code>500</code> if an action (or the flamingo server) fails.</p></li>
+</ul></li>
+<li><p>In Flamingo, an <em>action module</em> is a module with two functions that will be called by Flamingo at appropriate times:</p>
+<ul>
+<li><p><code>initialise(Arg)</code> for computing the initial state for the action module. Returns either <code>{ok, State}</code> if everything went well, where <code>State</code> is the initial state for the module; or <code>{error, Reason}</code> if the module could not be initialised.</p></li>
+<li><p><code>action(Req, Env, State)</code> an action function that takes three arguments: a request, the environment and the local state. An action should return either a triple or a pair on the following form:</p>
+<ul>
+<li><p><code>{new_state, Content, NewState}</code> for successfully returning the content <code>Content</code> and updating the local state to <code>NewState</code>.</p></li>
+<li><p><code>{no_change, Content}</code> for successfully returning the content <code>Content</code> without updating the local state.</p></li>
+</ul></li>
+</ul>
+<p>An action is considered unreliable: it may fail in various ways. For instance, by throwing an exception, or calling <code>exit/2</code>.</p></li>
+<li><p>For each routing group there must only be one action running at a time, but for the actions for different routing groups may run concurrently.</p></li>
+<li><p>The same action module may be registered for several routing groups. Each registration is considered independent by Flamingo.</p></li>
+</ul>
+<h2 id="part-1-the-flamingo-module">Part 1: The Flamingo module</h2>
+<p>Implement an Erlang module <code>flamingo</code> with the following API:</p>
+<ul>
+<li><p><code>new(Global)</code> for starting a Flamingo server, with the with the environment <code>Global</code>.</p>
+<p>Returns <code>{ok, Flamingo}</code> on success or <code>{error, Reason}</code> if some error occurred.</p></li>
+<li><p><code>route(Flamingo, Prefixes, Action, Arg)</code> for registering the action module <code>Action</code> as the action module for the routing group <code>Prefixes</code> at the Flamingo server. The initial local state is computed by calling <code>Action:initialise(Arg)</code>, if this fails then the route is not registered. Where <code>Prefixes</code> is a non-empty list of unique strings.</p>
+<p>If the same prefix is registered more than once (perhaps in different routing groups), it is the latest registered action that is matched.</p>
+<p>Returns <code>{ok, Id}</code> on success or <code>{error, Reason}</code> if some error occurred. Where <code>Id</code> is opaque (that is, you choose which type to use), but each <code>Id</code> should be unique.</p>
+<!-- At the oral exam we might discuss how the `Id` can be used for -->
+<!-- implementing an `drop_route` function. --></li>
+<li><p><code>request(Flamingo, Request, From, Ref)</code> for making the request <code>Request</code> to the Flamingo server.</p>
+<p>This function is non-blocking. When a response is computed, a message of the form <code>{Ref, {Status, Content}}</code> should be sent to <code>From</code>. Remember that a response is a pair consisting of a status code, <code>Status</code>, and a string, <code>Content</code>. If there are no matching routes the status code should be 404, and you decide the content of the string.</p></li>
+</ul>
+<p>Optimising Path/prefix handling is outside the scope of this assignment, focus on getting the behaviour correct first.</p>
+<h2 id="part-2-using-flamingo">Part 2: Using Flamingo</h2>
+<p>Demonstrate that you can use the <code>flamingo</code> library by:</p>
+<ol type="1">
+<li><p>Implement a module <code>hiphop</code> that exports a function <code>server/0</code> that returns a Flamingo server. The server should have three routes registered: <code>&quot;/hip&quot;</code>, <code>&quot;/hop&quot;</code> and <code>&quot;/hi&quot;</code>.</p>
+<p>When a request to <code>&quot;/hip&quot;</code> is made the server should return a string with the number of times <code>&quot;/hip&quot;</code> has been requested, and similar for <code>&quot;/hop&quot;</code>. For instance, the first time you make a request to <code>&quot;/hip&quot;</code> the Flamingo server should send the response <code>{200, &quot;1&quot;}</code>. When a request to <code>&quot;/hi&quot;</code> is made, then the server should send the string <code>&quot;Wassup&quot;</code>.</p></li>
+<li><p>Implement a module <code>counter</code> that exports a function <code>server/0</code> that returns a Flamingo server. The server should have two routes registered: <code>&quot;/inc_with&quot;</code> and <code>&quot;/dec_with&quot;</code>.</p>
+<p>The server should maintain a counter shared between the two routes. That is, when a request is made to <code>&quot;/inc_with&quot;</code> with an argument with key <code>x</code> and an integer <span class="math inline"><em>n</em></span> as the value (if there is no key named <code>x</code> or the value does not denote a positive integer, we consider <span class="math inline"><em>n</em></span> to be 1), then the shared counter is incremented with <span class="math inline"><em>n</em></span>, and the new value of the counter is sent as a response. Similarly, if a request is made to <code>&quot;/dec_with&quot;</code> the shared counter is decremented. The shared counter starts with the value zero.</p>
+<p>Thus, if you make three requests to <code>&quot;/inc_with&quot;</code> (with no arguments) and wait for successful responses and then make one request to <code>&quot;/dec_with&quot;</code> with an argument with key <code>x</code> and value <code>&quot;3&quot;</code>, then the server should send the string <code>&quot;0&quot;</code>.</p></li>
+</ol>
+<h2 id="example-use-of-flamingo">Example use of Flamingo</h2>
+<p>Following is a simple action module <code>greeter.erl</code> for generating greetings:</p>
+<div class="sourceCode"><pre class="sourceCode erlang"><code class="sourceCode erlang"><span class="kw">-module</span><span class="fu">(</span><span class="ch">greeter</span><span class="fu">).</span>
+<span class="kw">-export</span><span class="fu">([</span><span class="ch">initialise</span><span class="op">/</span><span class="dv">1</span><span class="fu">,</span> <span class="ch">action</span><span class="op">/</span><span class="dv">3</span><span class="fu">]).</span>
+
+<span class="fu">initialise(</span>_<span class="va">Arg</span><span class="fu">)</span> <span class="op">-&gt;</span> <span class="fu">{</span><span class="ch">ok</span><span class="fu">,</span> <span class="ch">nothing</span><span class="fu">}.</span>
+
+<span class="fu">action({</span>_<span class="va">Path</span><span class="fu">,</span> <span class="fu">[{</span><span class="st">&quot;name&quot;</span><span class="fu">,</span> <span class="va">Name</span><span class="fu">}</span> <span class="fu">|</span> _ <span class="fu">]},</span> <span class="va">Server</span><span class="fu">,</span> _<span class="fu">)</span> <span class="op">-&gt;</span>
+    <span class="fu">{</span><span class="ch">no_change</span><span class="fu">,</span>
+     <span class="fu">lists:concat([</span><span class="st">&quot;Greetings &quot;</span><span class="fu">,</span> <span class="va">Name</span><span class="fu">,</span> <span class="st">&quot;\n&quot;</span><span class="fu">,</span>
+                   <span class="st">&quot;You have reached &quot;</span><span class="fu">,</span> <span class="va">Server</span><span class="fu">])}.</span></code></pre></div>
+<p>The <code>greeter</code> module assumes that the environment is a single string.</p>
+<p>The following code shows how to use the <code>greeter</code> together with the <code>flamingo</code> module:</p>
+<div class="sourceCode"><pre class="sourceCode erlang"><code class="sourceCode erlang"><span class="kw">-module</span><span class="fu">(</span><span class="ch">greeting_tryout</span><span class="fu">).</span>
+<span class="kw">-export</span><span class="fu">([</span><span class="ch">greetings</span><span class="op">/</span><span class="dv">0</span><span class="fu">,</span> <span class="ch">try_it</span><span class="op">/</span><span class="dv">1</span><span class="fu">]).</span>
+
+<span class="fu">greetings()</span> <span class="op">-&gt;</span>
+    <span class="fu">{</span><span class="ch">ok</span><span class="fu">,</span> <span class="va">F</span><span class="fu">}</span> <span class="op">=</span> <span class="fu">flamingo:new(</span><span class="st">&quot;The Flamingo Server&quot;</span><span class="fu">),</span>
+    <span class="fu">flamingo:route(</span><span class="va">F</span><span class="fu">,</span> <span class="fu">[</span><span class="st">&quot;/hello&quot;</span><span class="fu">],</span> <span class="ch">greeter</span><span class="fu">,</span> <span class="ch">none</span><span class="fu">),</span>
+    <span class="va">F</span><span class="fu">.</span>
+
+<span class="fu">try_it(</span><span class="va">Server</span><span class="fu">)</span> <span class="op">-&gt;</span>
+    <span class="va">Me</span> <span class="op">=</span> <span class="fu">self(),</span>
+    <span class="va">Ref</span> <span class="op">=</span> <span class="fu">make_ref(),</span>
+    <span class="fu">flamingo:request(</span><span class="va">Server</span><span class="fu">,</span> <span class="fu">{</span><span class="st">&quot;/hello&quot;</span><span class="fu">,</span> <span class="fu">[{</span><span class="st">&quot;name&quot;</span><span class="fu">,</span> <span class="st">&quot;Student&quot;</span><span class="fu">}]},</span>
+                     <span class="va">Me</span><span class="fu">,</span> <span class="va">Ref</span><span class="fu">),</span>
+    <span class="kw">receive</span>
+        <span class="fu">{</span><span class="va">Ref</span><span class="fu">,</span> <span class="va">Reply</span><span class="fu">}</span> <span class="op">-&gt;</span> <span class="va">Reply</span>
+    <span class="kw">end</span><span class="fu">.</span></code></pre></div>
+<h2 id="hand-in-instructions">Hand-in Instructions</h2>
+<p>You should hand in two things:</p>
+<ol type="1">
+<li><p>A short report, <code>report.pdf</code>, explaining the main design of your code, and <strong>an assessment</strong> of your implementation, including what this assessment is based on.</p>
+<p>In this assignment, it is of particular interest that you discuss how you deal with unreliable actions.</p>
+<p>Also, if you have thoughts on how the API could be improved, feel free to share them.</p></li>
+<li><p>A ZIP archive <code>src.zip</code>, containing one directory <code>src</code>, containing your source code and tests. Your implementation of the <code>flamingo</code> module (thus in a file called <code>flamingo.erl</code>), the <code>hiphop</code> module, the <code>counter</code> module, the callback modules and the code you have used to test your modules in other file(s). Your test files should start with <code>test_</code>, so that our automated test can ignore them.</p></li>
+</ol>
+<p>Make sure that you adhere to the types of the API, and test that you do.</p>
+<p>To keep your TA happy, follow these simple rules:</p>
+<ol type="1">
+<li>The Erlang compiler, with the parameter <code>-Wall</code>, should not yield any errors or warnings for your code.</li>
+<li>You should comment your code properly, especially if you doubt its correctness, or if you think there is a more elegant way to write a certain piece of code. A good comment should explain your ideas and provide insight.</li>
+<li>Adhere to the restrictions set in the assignment text, and make sure that you export all of the requested API (even if some functions only have a dummy implementation).</li>
+<li>Describe clearly what parts of the assignment you have solved.</li>
+</ol>
+<hr />
+<p>End of assignment text.</p>
+</body>
+</html>

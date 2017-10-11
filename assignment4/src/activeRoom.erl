@@ -134,6 +134,7 @@ endQuestion(State) ->
             {{ok, OptionsDist, LastQ, Total, Final}, State1};
         true ->
             Final = false,
+            basicServer:kill(),
             {{ok, OptionsDist, LastQ, Total, Final}, State1}
     end.
 

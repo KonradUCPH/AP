@@ -121,13 +121,6 @@ timesup_non_conductor_test() ->
     end,
     ?assertMatch({error, nice_try}, Message). 
 
-join_test() ->
-    {ok,S} = kaboose:start(),
-    {ok,R} = kaboose:get_a_room(S), 
-    kaboose:add_question(R, {"What is your name?", [{correct, "Text"}, "Text"]}),    
-    {Aroom,_} = kaboose:play(R),
-    ?assertMatch({ok, _}, kaboose:join(Aroom, "Konrad")). 
-
 join_conductor_inform_test() ->
     {ok,S} = kaboose:start(),
     {ok,R} = kaboose:get_a_room(S), 
@@ -146,6 +139,7 @@ join_taken_nick_test() ->
     kaboose:add_question(R, {"What is your name?", [{correct, "Text"}, "Text"]}),    
     {Aroom,_} = kaboose:play(R),
     kaboose:join(Aroom, "Konrad"),
+    eliminate_msg(),
     ?assertMatch({error, "Konrad", is_taken}, kaboose:join(Aroom, "Konrad")). 
 
 leave_conductor_inform_test() ->
@@ -155,14 +149,12 @@ leave_conductor_inform_test() ->
     {Aroom,_} = kaboose:play(R),
     {ok, Ref} = kaboose:join(Aroom, "Konrad"),
     kaboose:leave(Aroom, Ref),
+    eliminate_msg(),
     receive 
         Message -> Message
     end,
-    receive 
-        Message2 -> Message2
-    end,
     Me = self(),
-    ?assertMatch({Me,{player_left, "Konrad", _}}, Message2).
+    ?assertMatch({Me,{player_left, "Konrad", _}}, Message).
 
 rejoin_conductor_inform_test() ->
     {ok,S} = kaboose:start(),
@@ -172,17 +164,13 @@ rejoin_conductor_inform_test() ->
     {ok, Ref} = kaboose:join(Aroom, "Konrad"),
     kaboose:leave(Aroom, Ref),
     kaboose:rejoin(Aroom, Ref),
-    receive 
+    eliminate_msg(),
+    eliminate_msg(),
+    receive
         Message -> Message
     end,
-    receive 
-        Message2 -> Message2
-    end,
-    receive 
-        Message3 -> Message3
-    end,
     Me = self(),
-    ?assertMatch({Me,{player_joined, "Konrad", _}}, Message3).
+    ?assertMatch({Me,{player_joined, "Konrad", _}}, Message).
 
 play_1000_points_test() ->
     {ok,S} = kaboose:start(),
@@ -190,9 +178,7 @@ play_1000_points_test() ->
     kaboose:add_question(R, {"What is your name?", [{correct, "Text"}, "Text"]}),    
     {Aroom,_} = kaboose:play(R),
     {ok, Ref} = kaboose:join(Aroom, "Konrad"),
-    receive 
-        _ -> i_dont_care
-    end,
+    eliminate_msg(),
     kaboose:next(Aroom),
     kaboose:guess(Aroom, Ref, 1),
     {ok,[1,_],Dict,_,true} = kaboose:timesup(Aroom),
@@ -205,13 +191,16 @@ play_500_points_test() ->
     kaboose:add_question(R, {"What is your name?", [{correct, "Text"}, "Text"]}),    
     {Aroom,_} = kaboose:play(R),
     {ok, Ref} = kaboose:join(Aroom, "Konrad"),
-    receive 
-        _ -> i_dont_care
-    end,
+    eliminate_msg(),
     kaboose:next(Aroom),
     timer:sleep(600),
     kaboose:guess(Aroom, Ref, 1),
     {ok,[1,_],Dict,_,true} = kaboose:timesup(Aroom),
     Points = maps:get("Konrad", Dict),
     ?assertMatch(500 ,Points).
+
+eliminate_msg() ->
+    receive
+        _ -> nom
+    end.
     
