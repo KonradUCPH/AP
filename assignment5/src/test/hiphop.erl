@@ -1,5 +1,5 @@
 -module(hiphop).
--export([server/0]).
+-export([server/0, try_it/2]).
 
 server() ->
     {ok, F} = flamingo:new("The HipHop Server, powered by FlamingoTM"),
@@ -7,3 +7,11 @@ server() ->
     flamingo:route(F, ["/hop"], simpleCounter, none),
     flamingo:route(F, ["/hi"], hello, none),
     F.
+
+try_it(Server, Path) ->
+    Me = self(),
+    Ref = make_ref(),
+    flamingo:request(Server, {Path, []}, Me, Ref),
+    receive
+        {Ref, Reply} -> Reply
+    end.

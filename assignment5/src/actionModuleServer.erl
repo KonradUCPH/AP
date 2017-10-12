@@ -1,8 +1,36 @@
--module(flamingo).
--export([new/1, route/4, request/4]).
+%%%-------------------------------------------------------------------
+%%% This module turns an actionModule into a server
+%%% based on the gen_server Example by Ken Friis Larsen (see below)
+%%% @author Per Steffen Czolbe
+%%%-------------------------------------------------------------------
+
+
+
+
+%%%-------------------------------------------------------------------
+%%% @author Ken Friis Larsen <ken@friislarsen.net>
+%%% @copyright (C) 2017, Ken Friis Larsen
+%%% @doc
+%%%
+%%% @end
+%%% Created : 12 Oct 2017 by Ken Friis Larsen <ken@friislarsen.net>
+%%%-------------------------------------------------------------------
+-module(actionModuleServer).
+
+%% needs action module with these callbacks:
+-callback initialise(Arg :: term()) ->
+    { ok, State :: term()} |
+    { error, Reason :: term()}.
+-callback action(Req :: term(), Env :: term(), State :: term()) ->
+    {new_state, Content :: term(), NewState :: term()} |
+    {no_change, Content :: term()}.
 
 %% obeys gen_server behaviour
 -behaviour(gen_server).
+
+%% API
+-export([start/2, action/3]).
+
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -11,45 +39,24 @@
 % define ?SERVER = ?MODULE = modulename
 -define(SERVER, ?MODULE).
 
+
 %%%===================================================================
 %%% API
 %%%===================================================================
 
-% new(Global) for starting a Flamingo server, with the with the environment Global.
-% Returns {ok, Flamingo} on success or {error, Reason} if some error occurred.
-new(Global) -> 
-    %start router action module
-    case actionModuleServer:start(router, none) of
-        {ok, RouterPid} -> gen_server:start(?MODULE, 
-                                        #{routerPid => RouterPid, 
-                                        routerModule => actionModuleServer,
-                                        enviroment => Global}, 
-                                        []);  % Module, args, options
-        {error, Reason} -> {error, Reason}
-    end.
+% ServerRef can be the Pid
+action(ServerRef, Request, Enviroment) -> 
+    gen_server:call(ServerRef, {action, Request, Enviroment}).
 
-% route(Flamingo, Prefixes, Action, Arg) for registering the action module 
-% Action as the action module for the routing group Prefixes at the Flamingo 
-% server. The initial local state is computed by calling  
-% Action:initialise(Arg), if this fails then the route is not registered. 
-% Where Prefixes is a non-empty list of unique strings.
-% If the same prefix is registered more than once (perhaps in different routing 
-% groups), it is the latest registered action that is matched.
-% Returns {ok, Id} on success or {error, Reason} if some error occurred. 
-% Where Id is opaque (that is, you choose which type to use), but each Id 
-% should be unique.
-route(Flamingo, Prefixes, Action, Arg) ->
-    gen_server:call(Flamingo, {addRoute, Prefixes, Action, Arg}).
-
-% request(Flamingo, Request, From, Ref) for making the request Request to the 
-% Flamingo server.
-% This function is non-blocking. When a response is computed, a message of 
-% the form {Ref, {Status, Content}} should be sent to From. 
-% Remember that a response is a pair consisting of a status code, Status, 
-% and a string, Content. If there are no matching routes the status code 
-% should be 404, and you decide the content of the string.
-request(Flamingo, Request, From, Ref) ->
-    gen_server:cast(Flamingo, {get, Request, From, Ref}).
+%%--------------------------------------------------------------------
+%% @doc
+%% Starts the server
+%%
+%% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
+%% @end
+%%--------------------------------------------------------------------
+start(ActionModule, Args) ->
+    gen_server:start(?MODULE, {ActionModule, Args}, []).  % Module, args, options
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -66,8 +73,11 @@ request(Flamingo, Request, From, Ref) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init(StateDict) ->
-    {ok, StateDict}.
+init({ActionModule, Args}) ->
+    case ActionModule:initialise(Args) of
+        {ok, State} -> {ok, {ActionModule, State}};
+        {error, Reason} -> {stop, Reason}
+    end.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -83,16 +93,11 @@ init(StateDict) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call({addRoute, Prefixes, Action, Arg}, _From, State) -> % request_reply
-    % start action
-    case actionModuleServer:start(Action, Arg) of
-        {error, Reason} -> {reply, {error, Reason}, State};
-        {ok, ActionPid} ->
-            % add routes
-            RouterModule = maps:get(routerModule, State),
-            RouterPid = maps:get(routerPid, State),
-            Reply = RouterModule:action(RouterPid, {add, Prefixes, ActionPid}, env),
-            {reply, Reply, State}
+handle_call({action, Request, Enviroment}, _From, State) ->
+    {ActionModule, ModuleState} = State,
+    case ActionModule:action(Request, Enviroment, ModuleState) of
+        {new_state, Content, NewState} -> {reply, Content, {ActionModule, NewState}};
+        {no_change, Content} -> {reply, Content, State}
     end.
 
 %%--------------------------------------------------------------------
@@ -105,19 +110,7 @@ handle_call({addRoute, Prefixes, Action, Arg}, _From, State) -> % request_reply
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast({get, Request, From, Ref}, State) ->  % async
-    RouterModule = maps:get(routerModule, State),
-    RouterPid = maps:get(routerPid, State),
-    Enviroment = maps:get(enviroment, State),
-    % get route
-    case RouterModule:action(RouterPid, {get, Request}, Enviroment) of
-        {error, 404} -> From ! {Ref, {404, "Not Found"}};
-        {ok, ActionPid} ->  
-            % perform action
-            %%TODO: add error handling
-            Content = actionModuleServer:action(ActionPid, Request, Enviroment),
-            From ! {Ref, {200, Content}}
-    end,
+handle_cast(_Msg, State) ->
     {noreply, State}.
 
 %%--------------------------------------------------------------------

@@ -8,3 +8,9 @@
            {i, "."},
            {i, "./test"},
            {outdir, "./ebin"}]}.
+
+% src/actionModules directory
+{'./actionModules/*', [debug_info,
+           {i, "."},
+           {i, "./test"},
+           {outdir, "./ebin"}]}.

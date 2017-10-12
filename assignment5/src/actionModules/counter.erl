@@ -1,5 +1,8 @@
--module(simpleCounter).
+-module(counter).
 -export([initialise/1, action/3]).
+
+% is a callback for the actionModuleServer
+-behaviour(actionModuleServer).
 
 initialise(Initial) -> {ok, Initial}.
 
