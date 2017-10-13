@@ -20,10 +20,9 @@
 new(Global) -> 
     %start router action module
     case actionModuleServer:start(router, none) of
+        % start flamingo server
         {ok, RouterPid} -> gen_server:start(?MODULE, 
-                                        #{routerPid => RouterPid, 
-                                        routerModule => actionModuleServer,
-                                        enviroment => Global}, 
+                                        [actionModuleServer, RouterPid, Global], 
                                         []);  % Module, args, options
         {error, Reason} -> {error, Reason}
     end.
@@ -66,8 +65,11 @@ request(Flamingo, Request, From, Ref) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init(StateDict) ->
-    {ok, StateDict}.
+init([RouterModule, RouterPid, GlobalEnvirmoment]) ->
+    State = #{routerPid => RouterPid, 
+            routerModule => RouterModule,
+            enviroment => GlobalEnvirmoment},
+    {ok, State}.
 
 %%--------------------------------------------------------------------
 %% @private
