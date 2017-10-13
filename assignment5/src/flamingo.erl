@@ -19,7 +19,7 @@
 % Returns {ok, Flamingo} on success or {error, Reason} if some error occurred.
 new(Global) -> 
     %start router action module
-    case actionModuleServer:start(router, none) of
+    case supervisedActionModuleServer:start(router, none) of
         % start flamingo server
         {ok, RouterPid} -> gen_server:start(?MODULE, 
                                         [actionModuleServer, RouterPid, Global], 
@@ -87,7 +87,7 @@ init([RouterModule, RouterPid, GlobalEnvirmoment]) ->
 %%--------------------------------------------------------------------
 handle_call({addRoute, Prefixes, Action, Arg}, _From, State) -> % request_reply
     % start action
-    case actionModuleServer:start(Action, Arg) of
+    case supervisedActionModuleServer:start(Action, Arg) of
         {error, Reason} -> {reply, {error, Reason}, State};
         {ok, ActionPid} ->
             % add routes
@@ -112,7 +112,11 @@ handle_cast({get, Request, From, Ref}, State) ->  % async
     RouterPid = maps:get(routerPid, State),
     Enviroment = maps:get(enviroment, State),
     % get route
-    case RouterModule:action(RouterPid, {get, Request}, Enviroment) of
+    RouterModule:action(RouterPid, {get, Request}, Enviroment, Ref),
+    receive
+        {Ref, Content}
+
+
         {error, 404} -> From ! {Ref, {404, "Not Found"}};
         {ok, ActionPid} ->  
             % perform action

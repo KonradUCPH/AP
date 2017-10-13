@@ -29,7 +29,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start/2, action/3]).
+-export([start/1, start/2, action/3]).
 
 
 %% gen_server callbacks
@@ -45,8 +45,8 @@
 %%%===================================================================
 
 % ServerRef can be the Pid
-action(ServerRef, Request, Enviroment) -> 
-    gen_server:call(ServerRef, {action, Request, Enviroment}).
+action(ServerRef, Request, Enviroment, Ref) -> 
+    gen_server:cast(ServerRef, {action, Ref, Request, Enviroment}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -55,8 +55,12 @@ action(ServerRef, Request, Enviroment) ->
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start(ActionModule, Args) ->
-    gen_server:start(?MODULE, {ActionModule, Args}, []).  % Module, args, options
+start(ActionModule, {Args, Supervisor}) ->
+    gen_server:start(?MODULE, [ActionModule, Args, Supervisor], []).  % Module, args, options
+
+% restart with old state
+start(State) ->
+    gen_server:start(?MODULE, [State], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -73,11 +77,12 @@ start(ActionModule, Args) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init({ActionModule, Args}) ->
+init([ActionModule, Args, Supervisor]) ->
     case ActionModule:initialise(Args) of
-        {ok, State} -> {ok, {ActionModule, State}};
+        {ok, ModuleState} -> {ok, {Supervisor, ActionModule, ModuleState}};
         {error, Reason} -> {stop, Reason}
-    end.
+    end;
+init([State]) -> {ok, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -93,12 +98,8 @@ init({ActionModule, Args}) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call({action, Request, Enviroment}, _From, State) ->
-    {ActionModule, ModuleState} = State,
-    case ActionModule:action(Request, Enviroment, ModuleState) of
-        {new_state, Content, NewState} -> {reply, Content, {ActionModule, NewState}};
-        {no_change, Content} -> {reply, Content, State}
-    end.
+handle_call(_Msg, State) ->
+    {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -110,8 +111,17 @@ handle_call({action, Request, Enviroment}, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast(_Msg, State) ->
-    {noreply, State}.
+handle_cast({action, Ref, Request, Enviroment}, From, State) ->
+    {Supervisor, ActionModule, ModuleState} = State,
+    Supervisor ! {backup, State}, % backup state
+    case ActionModule:action(Request, Enviroment, ModuleState) of
+        {new_state, Content, NewModuleState} -> 
+            {noreply, {Supervisor, ActionModule, NewModuleState}},
+            From ! {Ref, Content};
+        {no_change, Content} -> 
+            {noreply, State},
+            From ! {Ref, Content}
+    end.
 
 %%--------------------------------------------------------------------
 %% @private

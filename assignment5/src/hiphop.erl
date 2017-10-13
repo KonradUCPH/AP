@@ -6,6 +6,7 @@ server() ->
     flamingo:route(F, ["/hip"], simpleCounter, none),
     flamingo:route(F, ["/hop"], simpleCounter, none),
     flamingo:route(F, ["/hi"], hello, none),
+    flamingo:route(F, ["/f"], faultyCounter, none),
     F.
 
 try_it(Server, Path) ->
@@ -13,5 +14,8 @@ try_it(Server, Path) ->
     Ref = make_ref(),
     flamingo:request(Server, {Path, []}, Me, Ref),
     receive
-        {Ref, Reply} -> Reply
+        {Ref, Reply} -> Reply;
+        M -> M
+    after
+        6000 -> timeout
     end.
