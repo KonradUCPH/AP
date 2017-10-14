@@ -25,11 +25,13 @@
     {new_state, Content :: term(), NewState :: term()} |
     {no_change, Content :: term()}.
 
-%% obeys gen_server behaviour
+%% uses gen_server
 -behaviour(gen_server).
+%% uses simpleSupervisor
+-behaviour(simpleSupervisor).
 
 %% API
--export([start/2, action/3]).
+-export([start/2, action/3, start_link/1]).
 
 
 %% gen_server callbacks
@@ -46,11 +48,12 @@
 
 % ServerRef can be the Pid
 action(ServerRef, Request, Enviroment) -> 
-    gen_server:cast(ServerRef, {action, self(), Request, Enviroment}),
+    gen_server:cast(ServerRef, {self(), {action, Request, Enviroment}}),
     receive
+        {_From, worker_died} -> {error, 500};
         {_From, Content} -> Content
     after
-        500 ->  "no msg received"
+        5000 ->  "no msg received"
     end.
 
 %%--------------------------------------------------------------------
@@ -61,7 +64,11 @@ action(ServerRef, Request, Enviroment) ->
 %% @end
 %%--------------------------------------------------------------------
 start(ActionModule, Args) ->
-    gen_server:start(?MODULE, {ActionModule, Args}, []).  % Module, args, options
+    simpleSupervisor:start(?MODULE, [ActionModule, Args]).
+
+
+start_link([ActionModule, Args]) ->
+    gen_server:start_link(?MODULE, [ActionModule, Args], []).  % Module, args, options
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -78,7 +85,7 @@ start(ActionModule, Args) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init({ActionModule, Args}) ->
+init([ActionModule, Args]) ->
     case ActionModule:initialise(Args) of
         {ok, State} -> {ok, {ActionModule, State}};
         {error, Reason} -> {stop, Reason}
@@ -111,7 +118,7 @@ handle_call(_Request, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast({action, From, Request, Enviroment}, State) ->
+handle_cast({From, {action, Request, Enviroment}}, State) ->
     {ActionModule, ModuleState} = State,
     case ActionModule:action(Request, Enviroment, ModuleState) of
         {new_state, Content, NewState} ->

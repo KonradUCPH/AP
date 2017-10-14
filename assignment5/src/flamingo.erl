@@ -113,12 +113,15 @@ handle_cast({get, Request, From, Ref}, State) ->  % async
     Enviroment = maps:get(enviroment, State),
     % get route
     case RouterModule:action(RouterPid, {get, Request}, Enviroment) of
+        {error, 500} -> From ! {Ref, {500, "Internal Error"}};
         {error, 404} -> From ! {Ref, {404, "Not Found"}};
         {ok, ActionPid} ->  
             % perform action
-            %%TODO: add error handling
-            Content = actionModuleServer:action(ActionPid, Request, Enviroment),
-            From ! {Ref, {200, Content}}
+            case actionModuleServer:action(ActionPid, Request, Enviroment) of
+                {error, 500} -> From ! {Ref, {500, "Internal Error"}};
+                {error, 404} -> From ! {Ref, {404, "Not Found"}};
+                Content -> From ! {Ref, {200, Content}}
+            end
     end,
     {noreply, State}.
 
