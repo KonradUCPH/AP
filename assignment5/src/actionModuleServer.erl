@@ -46,7 +46,12 @@
 
 % ServerRef can be the Pid
 action(ServerRef, Request, Enviroment) -> 
-    gen_server:call(ServerRef, {action, Request, Enviroment}).
+    gen_server:cast(ServerRef, {action, self(), Request, Enviroment}),
+    receive
+        {_From, Content} -> Content
+    after
+        500 ->  "no msg received"
+    end.
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -93,12 +98,8 @@ init({ActionModule, Args}) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call({action, Request, Enviroment}, _From, State) ->
-    {ActionModule, ModuleState} = State,
-    case ActionModule:action(Request, Enviroment, ModuleState) of
-        {new_state, Content, NewState} -> {reply, Content, {ActionModule, NewState}};
-        {no_change, Content} -> {reply, Content, State}
-    end.
+handle_call(_Request, _From, State) -> 
+    {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -110,8 +111,20 @@ handle_call({action, Request, Enviroment}, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast(_Msg, State) ->
-    {noreply, State}.
+handle_cast({action, From, Request, Enviroment}, State) ->
+    {ActionModule, ModuleState} = State,
+    case ActionModule:action(Request, Enviroment, ModuleState) of
+        {new_state, Content, NewState} ->
+            reply(From, Content),
+            {noreply, {ActionModule, NewState}};
+        {no_change, Content} ->
+            reply(From, Content),
+            {noreply, State}
+    end.
+
+reply(To, Response) ->
+    To ! {self(), Response}.
+
 
 %%--------------------------------------------------------------------
 %% @private
