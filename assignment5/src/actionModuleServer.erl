@@ -52,8 +52,6 @@ action(ServerRef, Request, Enviroment) ->
     receive
         {_From, worker_died} -> {error, 500};
         {_From, Content} -> Content
-    after
-        5000 ->  "no msg received"
     end.
 
 %%--------------------------------------------------------------------
