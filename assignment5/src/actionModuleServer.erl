@@ -28,7 +28,8 @@
 %% uses gen_server
 -behaviour(gen_server).
 %% uses simpleSupervisor
--behaviour(simpleSupervisor).
+%-behaviour(simpleSupervisor).
+%Does not ork with online TA, it works fine when compiled by us.
 
 %% API
 -export([start/2, action/3, start_link/1]).

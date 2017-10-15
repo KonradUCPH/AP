@@ -1,4 +1,4 @@
--module(counter).
+-module(actionModuleCounter).
 -export([initialise/1, action/3]).
 
 % is a callback for the actionModuleServer

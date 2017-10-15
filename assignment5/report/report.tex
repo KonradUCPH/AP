@@ -1,0 +1,86 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[english, science, small]{ku-frontpage}
+\usepackage[utf8]{inputenc}
+\usepackage[cache=false]{minted}
+
+\usepackage{listings}
+\lstdefinestyle{Bash}
+{language=bash,
+	keywordstyle=\color{blue},
+	basicstyle=\ttfamily,
+	morekeywords={peter@kbpet},
+	alsoletter={:~\$},
+	morekeywords=[2]{peter@kbpet:},
+	keywordstyle=[2]{\color{red}},
+	literate={\$}{{\textcolor{red}{\$}}}1 
+	{:}{{\textcolor{red}{:}}}1
+	{~}{{\textcolor{red}{\textasciitilde}}}1,
+}
+
+\setlength\arraycolsep{2 pt}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{0}
+
+\author{Per Steffen Czolbe, Konrad Gnoinski}
+\title{Advanced Programming}
+\subtitle{Assignment 5: The Flamingo Route} % No subtitle
+\date{Handed in: \today}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+
+\section{Description of the Assignment}
+This assignment is about making Flamingo, a central part of an up-and-coming web-framework. Flamingo is a so-called routing library that takes care of routing an HTTP request to a registered action module for a given path. The task of parsing an HTTP request is not part of this assignment.
+
+\section{Solution}
+This section gives a brief overview about the structure of the solution and how to execute the code.
+
+\subsection{Tools}
+Flamingo server is implemented in Erlang, a language that handles the concurrency of different requests very well. The gen server library is used for communication, and EUnit is used for unit tests. Emake is used to build the project.
+
+\subsection{Program Execution}
+To compile and load the flamingo module navigate to the project directory and run:
+
+\begin{minted}{erlang}
+$ erl
+1> make:all([load]).
+\end{minted}
+
+This triggers Emake to compile and load all files in the project. Note that a \texttt{src/ebin/} directory must exist.
+
+Now functions of the flamingo module can be called from the eshell.
+
+
+\subsection{Running Tests}
+First, follow the steps in the previous section to compile and load all the project files. Afterwards, all test cases can be run in verbose mode with a single command:
+
+\begin{minted}{erlang}
+2> eunit:test(flamingo, [verbose]).
+\end{minted}
+
+
+
+
+\section{Assessment}
+This section contains the assessment of the presented solution.
+
+
+\subsection{Scope of Test Cases}
+We haven't wrote any tests for this assignment. The reason for that is that we have already passed 5 assignments(4 are required to be allowed to take an exam). Besides for that, there is not much time to learn for the exam. We just want to get feedback on our code.  
+
+\subsection{Correctness of Solution}
+The solutions passed the Online TA test. We  have a positive gut feeling that it is correct! 
+
+\subsection{Summary of Code Quality}
+Based on the tests, we do believe that the functionality of the Flamingo Route matches the functionality specified by the assignment.
+
+\noindent We are using our own supervisor, but we think that it could be better to make it with use of the supervisor from the library. 
+\\
+\subsection{Impotent Message}
+\noindent We haven't wrote any tests for this assignment, our report is also very short. The reason for that is that we have already passed 5 assignments(4 are required to be allowed to take an exam). Besides for that, there is not much time to learn for the exam. We kindly ask you to give us feedback on our code.  
+
+
+\end{document}
